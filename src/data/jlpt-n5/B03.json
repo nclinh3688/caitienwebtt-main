@@ -1,0 +1,293 @@
+{
+  "lessonNumber": 3,
+  "japaneseTitle": "第3課 - ちてんとちい",
+  "vietnameseTitle": "Bài 3 - Địa điểm và vị trí",
+  "englishTitle": "Lesson 3 - Location and Position",
+  "summary": "Học cách diễn tả vị trí, địa điểm và sử dụng các từ chỉ thị trong tiếng Nhật",
+  "estimatedTime": "8-10 giờ",
+  "difficulty": "⭐⭐⭐⭐⭐",
+  "grammarPatterns": [
+    {
+      "id": 1,
+      "pattern": "ここ、そこ、あそこ は N (địa điểm) です",
+      "meaning": "Chỗ này/đó/kia là N",
+      "explanation": "「ここ」、「そこ」、「あそこ」là các đại danh từ chỉ nơi chốn. 「ここ」chỉ chỗ của người nói (Trong phạm vi của người nói). 「そこ」là chỗ của người nghe (Trong phạm vi của người nghe). 「あそこ」chỉ nơi xa cả hai người.",
+      "examples": [
+        {
+          "japanese": "ここは きょうしつです。",
+          "kanji": "ここは 教室です。",
+          "vietnamese": "Đây là phòng học.",
+          "english": "This is a classroom."
+        },
+        {
+          "japanese": "そこは おてあらいです。",
+          "kanji": "そこは お手洗いです。",
+          "vietnamese": "Đó là nhà vệ sinh.",
+          "english": "That is a restroom."
+        },
+        {
+          "japanese": "あそこは しょくどうです。",
+          "kanji": "あそこは 食堂です。",
+          "vietnamese": "Kia là nhà ăn tập thể.",
+          "english": "That over there is a cafeteria."
+        }
+      ],
+      "notes": [
+        "Khi người nói và người nghe ở cùng một địa điểm thì cả hai người đều sử dụng 「ここ」",
+        "ここ chỉ vị trí gần người nói",
+        "そこ chỉ vị trí gần người nghe",
+        "あそこ chỉ vị trí xa cả hai người"
+      ]
+    },
+    {
+      "id": 2,
+      "pattern": "N (địa điểm) は ここ・そこ・あそこです。/ N (địa điểm) は どこ ですか。",
+      "meaning": "N ở chỗ này (chỗ đó, chỗ kia) - chỉ vị trí, tồn tại",
+      "explanation": "N ở chỗ này (chỗ đó, chỗ kia) (chỉ vị trí, tồn tại). Có thể mở rộng trường hợp này cho địa điểm tồn tại của người và vật. N１(người hoặc vật) は N２ (địa điểm) です。N1 ở N2.",
+      "examples": [
+        {
+          "japanese": "ロビーは ここです。",
+          "kanji": "ロビーは ここです。",
+          "vietnamese": "Hành lang ở đây.",
+          "english": "The lobby is here."
+        },
+        {
+          "japanese": "エレベーターは あそこです。",
+          "kanji": "エレベーターは あそこです。",
+          "vietnamese": "Cầu thang máy ở chỗ kia.",
+          "english": "The elevator is over there."
+        },
+        {
+          "japanese": "うけつけは そこです。",
+          "kanji": "受付は そこです。",
+          "vietnamese": "Tiếp tân ở chỗ đó.",
+          "english": "The reception desk is there."
+        }
+      ],
+      "notes": [
+        "Câu hỏi cho địa điểm: N (địa điểm) は どこ ですか。N ở đâu?",
+        "Có thể mở rộng cho địa điểm tồn tại của người và vật",
+        "Dùng để chỉ vị trí cụ thể của địa điểm"
+      ]
+    },
+    {
+      "id": 3,
+      "pattern": "こちら・そちら・あちら・どちら",
+      "meaning": "Cách nói lịch sự hơn",
+      "explanation": "Nghĩa tương đương với 「ここ・そこ・あそこ・どこ」nhưng trang trọng, lịch sự hơn. Nghĩa gốc của chúng là các đại danh từ chỉ phương hướng.",
+      "examples": [
+        {
+          "japanese": "でんわは どちらですか。",
+          "kanji": "電話は どちらですか。",
+          "vietnamese": "Điện thoại ở đâu nhỉ?",
+          "english": "Where is the telephone?"
+        },
+        {
+          "japanese": "… あちらです。",
+          "kanji": "… あちらです。",
+          "vietnamese": "… Ở đằng kia.",
+          "english": "… It's over there."
+        },
+        {
+          "japanese": "（お）くには どちらですか。",
+          "kanji": "（お）国は どちらですか。",
+          "vietnamese": "Đất nước của bạn là ở đâu?",
+          "english": "Which country are you from?"
+        }
+      ],
+      "notes": [
+        "Với câu hỏi 「あなたのかいしゃは どちらですか。」thì có thể hiểu theo 2 nghĩa: Công ty bạn ở đâu? và Công ty bạn là công ty nào? (tên công ty)",
+        "Phần lớn được hiểu theo nghĩa thứ 2",
+        "Dùng trong tình huống trang trọng, lịch sự"
+      ]
+    },
+    {
+      "id": 4,
+      "pattern": "これ・それ・あれ は N1 の N2 です。",
+      "meaning": "Cái này/cái kia/cái đó là N2 của N1 - xuất xứ",
+      "explanation": "Dùng khi muốn nói 1 đồ vật nào đó có xuất xứ từ đâu, do nước nào hoặc công ty nào sản xuất ra. Câu hỏi どこの: これ・それ・あれ は どこ の N2 ですか。Là câu hỏi cho mẫu câu trên, dùng để hỏi xuất xứ của đồ vật.",
+      "examples": [
+        {
+          "japanese": "あれは 日本の シャープペンシルです。",
+          "kanji": "あれは 日本の シャープペンシルです。",
+          "vietnamese": "Kia là bút chì kim của Nhật.",
+          "english": "That is a mechanical pencil from Japan."
+        },
+        {
+          "japanese": "それは ソニーの テレビです。",
+          "kanji": "それは ソニーの テレビです。",
+          "vietnamese": "Đó là tivi của Sony.",
+          "english": "That is a Sony television."
+        },
+        {
+          "japanese": "これは どこの じどうしゃですか。",
+          "kanji": "これは どこの 自動車ですか。",
+          "vietnamese": "Đây là ôtô của nước nào/của công ty nào?",
+          "english": "Which country/company is this car from?"
+        }
+      ],
+      "notes": [
+        "Dùng để hỏi xuất xứ của đồ vật",
+        "Có thể dùng để chỉ thương hiệu, quốc gia, công ty",
+        "どこの = của nước nào, của đâu",
+        "Thường dùng để hỏi về nguồn gốc sản phẩm"
+      ]
+    },
+    {
+      "id": 5,
+      "pattern": "これ・それ・あれ は N1（Loại hình, thể loại）の N2 です。",
+      "meaning": "Cái này/cái kia/cái đó là N2 thuộc loại hình/thể loại N1 - thuộc tính",
+      "explanation": "Dùng khi muốn nói về thuộc tính của đồ vật: thuộc lĩnh vực gì, về chuyên ngành nào, tiếng nước nào…. Câu hỏi なんの: これ・それ・あれ は なん の N ですか. Là câu hỏi cho mẫu câu trên, dùng để khi muốn hỏi 1 vật nào đó thuộc lĩnh vực gì, về chuyên ngành nào, viết bằng tiếng nước nào….",
+      "examples": [
+        {
+          "japanese": "これは じどうしゃの ほんです。",
+          "kanji": "これは 自動車の 本です。",
+          "vietnamese": "Đây là quyển sách về xe ôtô.",
+          "english": "This is a book about cars."
+        },
+        {
+          "japanese": "それは にほんごの しんぶんです。",
+          "kanji": "それは 日本語の 新聞です。",
+          "vietnamese": "Đó là tờ báo tiếng Nhật.",
+          "english": "That is a Japanese newspaper."
+        },
+        {
+          "japanese": "これ は なんの ざっしですか。",
+          "kanji": "これは 何の 雑誌ですか。",
+          "vietnamese": "Đây là tạp chí gì?",
+          "english": "What kind of magazine is this?"
+        }
+      ],
+      "notes": [
+        "Có thể dùng để nói 1 công ty nào đó hoạt động trong lĩnh vực nào",
+        "Dùng để phân loại sách, báo, tạp chí",
+        "なんの = loại gì, thể loại gì",
+        "Có thể dùng với nhiều loại danh từ khác"
+      ]
+    },
+    {
+      "id": 6,
+      "pattern": "N は いくらですか。",
+      "meaning": "N bao nhiêu tiền",
+      "explanation": "N bao nhiêu tiền. Dùng để hỏi giá cả của đồ vật.",
+      "examples": [
+        {
+          "japanese": "このざっし は いくらですか。",
+          "kanji": "この雑誌は いくらですか。",
+          "vietnamese": "Cái áo này bao nhiêu tiền?",
+          "english": "How much is this magazine?"
+        },
+        {
+          "japanese": "…１００円です。",
+          "kanji": "…１００円です。",
+          "vietnamese": "…100 Yên.",
+          "english": "It's 100 yen."
+        },
+        {
+          "japanese": "あのほんは いくらですか。",
+          "kanji": "あの本は いくらですか。",
+          "vietnamese": "Cuốn sách kia bao nhiêu tiền?",
+          "english": "How much is that book?"
+        }
+      ],
+      "notes": [
+        "Dùng để hỏi giá cả của đồ vật",
+        "Có thể trả lời bằng số tiền + 円",
+        "Thường dùng khi mua sắm",
+        "Có thể thêm おいくら để lịch sự hơn"
+      ]
+    },
+    {
+      "id": 7,
+      "pattern": "N は どこですか。",
+      "meaning": "N ở đâu",
+      "explanation": "N ở đâu. Dùng để hỏi vị trí của địa điểm hoặc đồ vật.",
+      "examples": [
+        {
+          "japanese": "トイレは どこですか。",
+          "kanji": "トイレは どこですか。",
+          "vietnamese": "Nhà vệ sinh ở đâu?",
+          "english": "Where is the toilet?"
+        },
+        {
+          "japanese": "… あそこです。",
+          "kanji": "… あそこです。",
+          "vietnamese": "… Ở đằng kia.",
+          "english": "… It's over there."
+        },
+        {
+          "japanese": "エレベーターは どこですか。",
+          "kanji": "エレベーターは どこですか。",
+          "vietnamese": "Cầu thang máy ở đâu?",
+          "english": "Where is the elevator?"
+        }
+      ],
+      "notes": [
+        "Dùng để hỏi vị trí của địa điểm hoặc đồ vật",
+        "Thường dùng để hỏi đường",
+        "Có thể kết hợp với các từ chỉ thị",
+        "Phù hợp trong tình huống cần tìm kiếm"
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "title": "Bài tập 1: Điền từ vào chỗ trống",
+      "description": "Điền đại từ chỉ nơi chốn thích hợp vào chỗ trống",
+      "questions": [
+        {
+          "question": "___ は きょうしつです。",
+          "answer": "ここ",
+          "kanji": "ここ",
+          "explanation": "Đây là phòng học - dùng ここ vì người nói đang ở trong phòng học"
+        },
+        {
+          "question": "でんわは ___ ですか。",
+          "answer": "どこ",
+          "kanji": "どこ",
+          "explanation": "Điện thoại ở đâu - dùng どこ để hỏi vị trí"
+        },
+        {
+          "question": "あそこは ___ です。",
+          "answer": "しょくどう",
+          "kanji": "食堂",
+          "explanation": "Kia là nhà ăn tập thể - dùng あそこ để chỉ nơi xa cả hai người"
+        }
+      ]
+    },
+    {
+      "title": "Bài tập 2: Dịch câu",
+      "description": "Dịch các câu sau sang tiếng Nhật",
+      "questions": [
+        {
+          "question": "Đây là bệnh viện",
+          "answer": "ここは びょういんです。",
+          "kanji": "ここは 病院です。",
+          "explanation": "Dùng ここ để chỉ nơi người nói đang ở"
+        },
+        {
+          "question": "Thư viện ở đâu?",
+          "answer": "としょかんは どこですか。",
+          "kanji": "図書館は どこですか。",
+          "explanation": "Dùng どこ để hỏi vị trí của thư viện"
+        },
+        {
+          "question": "Đó là trường đại học",
+          "answer": "そこは だいがくです。",
+          "kanji": "そこは 大学です。",
+          "explanation": "Dùng そこ để chỉ nơi người nghe đang ở"
+        }
+      ]
+    }
+  ],
+  "culturalNotes": [
+    {
+      "title": "Văn hóa Nhật Bản",
+      "content": "Trong văn hóa Nhật Bản, việc sử dụng đúng các đại từ chỉ nơi chốn rất quan trọng để thể hiện sự tôn trọng và hiểu biết về không gian. Người Nhật rất chú ý đến vị trí tương đối giữa người nói và người nghe."
+    },
+    {
+      "title": "Giao tiếp lịch sự",
+      "content": "Khi giao tiếp với người lớn tuổi hoặc trong môi trường trang trọng, người Nhật thường sử dụng こちら、そちら、あちら thay vì ここ、そこ、あそこ để thể hiện sự lịch sự."
+    }
+  ]
+}
