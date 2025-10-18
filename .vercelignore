@@ -1,13 +1,12 @@
 # Dependencies
-node_modules/
+node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Production build
-.next/
-out/
-dist/
+# Production
+.next
+out
 
 # Environment variables
 .env
@@ -18,40 +17,33 @@ dist/
 
 # Database
 prisma/dev.db
-prisma/prisma/dev.db
-*.db
+prisma/dev.db-journal
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Logs
-logs/
 *.log
 
 # Runtime data
-pids/
+pids
 *.pid
 *.seed
 *.pid.lock
 
 # Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
+coverage
 
 # Dependency directories
 jspm_packages/
 
 # Optional npm cache directory
 .npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
 
 # Optional REPL history
 .node_repl_history
@@ -66,46 +58,23 @@ jspm_packages/
 .cache
 .parcel-cache
 
-# Next.js build output
+# next.js build output
 .next
 
-# Nuxt.js build / generate output
+# nuxt.js build output
 .nuxt
-dist
 
-# Storybook build outputs
-.out
-.storybook-out
+# vuepress build output
+.vuepress/dist
 
-# Temporary folders
-tmp/
-temp/
+# Serverless directories
+.serverless
 
-# Editor directories and files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# FuseBox cache
+.fusebox/
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# DynamoDB Local files
+.dynamodb/
 
-# Audio files (moved to CDN)
-audio-backup/
-
-# Test files
-src/app/test*
-src/app/debug*
-src/app/demo*
-
-# Backup files
-*.backup
-*.bak
-*.tmp
+# TernJS port file
+.tern-port
