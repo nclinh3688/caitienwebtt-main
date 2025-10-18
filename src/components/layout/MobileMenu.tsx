@@ -310,12 +310,12 @@ export default function MobileMenu({
 
   const getHeaderTitle = () => {
     switch (currentView) {
-      case 'main': return 'Menu';
+      case 'main': return '';
       case 'languages': return 'KHÓA HỌC';
       case 'levels': return selectedLanguage;
       case 'content': return selectedLevel;
       case 'dropdown': return selectedLanguage;
-      default: return 'Menu';
+      default: return '';
     }
   };
 

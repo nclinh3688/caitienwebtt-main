@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
+interface CourseWhereClause {
+  language?: string;
+  level?: string;
+  isPublished?: boolean;
+}
+
 const prisma = new PrismaClient();
 
 // GET /api/courses - Get all courses
@@ -11,7 +17,7 @@ export async function GET(request: NextRequest) {
     const level = searchParams.get('level');
     const published = searchParams.get('published');
 
-    const where: any = {};
+    const where: CourseWhereClause = {};
     
     if (language) where.language = language;
     if (level) where.level = level;

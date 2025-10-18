@@ -7,10 +7,7 @@ import {
   Star, 
   Award, 
   Target, 
-  Zap,
   Crown,
-  Medal,
-  Gift,
   Sparkles,
   CheckCircle
 } from 'lucide-react';

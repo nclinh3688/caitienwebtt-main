@@ -1,19 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const { userId } = await request.json();
 
     // Find user
     const user = await prisma.user.findUnique({
@@ -41,7 +39,7 @@ export async function POST(request: Request) {
   }
 }
 
-async function generateSmartAssignments(user: any) {
+async function generateSmartAssignments(user: User) {
   // In a real implementation, this would analyze user progress and create relevant assignments
   // For now, we'll return mock assignments with realistic data
   
@@ -112,7 +110,7 @@ async function generateSmartAssignments(user: any) {
   return baseAssignments;
 }
 
-async function getActiveReminders(user: any) {
+async function getActiveReminders(user: User) {
   // Return active study reminders for the user
   return [
     {

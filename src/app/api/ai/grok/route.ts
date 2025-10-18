@@ -1,5 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface VocabularyItem {
+  japanese?: string;
+  meaning?: string;
+  pronunciation?: string;
+  example?: string;
+}
+
+interface GrammarItem {
+  pattern?: string;
+  meaning?: string;
+  usage?: string;
+}
+
+interface KanjiItem {
+  character?: string;
+  meaning?: string;
+  onyomi?: string;
+  kunyomi?: string;
+  strokeCount?: number;
+  radicals?: string[];
+}
+
+interface GrokContext {
+  pageType: 'vocabulary' | 'grammar' | 'kanji' | string;
+  userLevel?: string;
+  currentItem?: VocabularyItem | GrammarItem | KanjiItem;
+  category?: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { question, context, model = 'grok-beta', maxTokens = 500, temperature = 0.8 } = await request.json();
@@ -23,7 +52,7 @@ export async function POST(request: NextRequest) {
       console.warn('Real Grok API failed, using simulation:', grokError);
       
       // Fallback to simulation
-      const grokResponse = simulateGrokResponse(question, context, systemPrompt, userMessage);
+      const grokResponse = simulateGrokResponse(question, context);
       return NextResponse.json({
         content: grokResponse,
         confidence: 0.85,
@@ -40,7 +69,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function callRealGrokAPI(question: string, context: any, systemPrompt: string, userMessage: string, model: string, maxTokens: number, temperature: number): Promise<string> {
+async function callRealGrokAPI(question: string, context: GrokContext, systemPrompt: string, userMessage: string, model: string, maxTokens: number, temperature: number): Promise<string> {
   const grokApiKey = process.env.GROK_API_KEY;
   
   if (!grokApiKey) {
@@ -75,7 +104,7 @@ async function callRealGrokAPI(question: string, context: any, systemPrompt: str
   return data.choices?.[0]?.message?.content || 'Xin lỗi, tôi không thể trả lời câu hỏi này.';
 }
 
-function createGrokSystemPrompt(context: any): string {
+function createGrokSystemPrompt(context: GrokContext): string {
   const { pageType, userLevel = 'N5' } = context;
   
   const basePrompt = `Bạn là Grok AI - một AI assistant thông minh, hài hước và trực tiếp của xAI (Elon Musk).
@@ -134,35 +163,38 @@ Chuyên môn: Kanji tiếng Nhật
   }
 }
 
-function createGrokUserMessage(question: string, context: any): string {
+function createGrokUserMessage(question: string, context: GrokContext): string {
   const { currentItem, category } = context;
   
   let contextInfo = '';
   
   if (currentItem) {
     if (context.pageType === 'vocabulary') {
+      const item = currentItem as VocabularyItem;
       contextInfo = `
 Thông tin từ vựng hiện tại:
-- Từ: ${currentItem.japanese || 'N/A'}
-- Nghĩa: ${currentItem.meaning || 'N/A'}
-- Phát âm: ${currentItem.pronunciation || 'N/A'}
-- Ví dụ: ${currentItem.example || 'N/A'}
+- Từ: ${item.japanese || 'N/A'}
+- Nghĩa: ${item.meaning || 'N/A'}
+- Phát âm: ${item.pronunciation || 'N/A'}
+- Ví dụ: ${item.example || 'N/A'}
 `;
     } else if (context.pageType === 'grammar') {
+      const item = currentItem as GrammarItem;
       contextInfo = `
 Thông tin ngữ pháp hiện tại:
-- Pattern: ${currentItem.pattern || 'N/A'}
-- Nghĩa: ${currentItem.meaning || 'N/A'}
-- Cách dùng: ${currentItem.usage || 'N/A'}
+- Pattern: ${item.pattern || 'N/A'}
+- Nghĩa: ${item.meaning || 'N/A'}
+- Cách dùng: ${item.usage || 'N/A'}
 `;
     } else if (context.pageType === 'kanji') {
+      const item = currentItem as KanjiItem;
       contextInfo = `
 Thông tin kanji hiện tại:
-- Kanji: ${currentItem.character || 'N/A'}
-- Nghĩa: ${currentItem.meaning || 'N/A'}
-- Onyomi: ${currentItem.onyomi || 'N/A'}
-- Kunyomi: ${currentItem.kunyomi || 'N/A'}
-- Số nét: ${currentItem.strokeCount || 'N/A'}
+- Kanji: ${item.character || 'N/A'}
+- Nghĩa: ${item.meaning || 'N/A'}
+- Onyomi: ${item.onyomi || 'N/A'}
+- Kunyomi: ${item.kunyomi || 'N/A'}
+- Số nét: ${item.strokeCount || 'N/A'}
 `;
     }
   }
@@ -176,26 +208,26 @@ Chủ đề: ${category || 'N/A'}
 Hãy trả lời theo phong cách Grok - thông minh, hài hước và trực tiếp!`;
 }
 
-function simulateGrokResponse(question: string, context: any, systemPrompt: string, userMessage: string): string {
+function simulateGrokResponse(question: string, context: GrokContext): string {
   const { pageType, currentItem, userLevel = 'N5' } = context;
   const questionLower = question.toLowerCase();
   
   // Grok-style responses (humorous, direct, real-time aware)
   const grokResponses = {
     vocabulary: [
-      `Ah, từ "${currentItem?.japanese || 'này'}"! 🤓 Đây là một từ rất thú vị trong ${userLevel}. Nghĩa là "${currentItem?.meaning || '...'}" - khá đơn giản phải không?`,
-      `Từ "${currentItem?.japanese || 'này'}" có nghĩa là "${currentItem?.meaning || '...'}"! 💡 Mẹo nhỏ: Hãy liên tưởng đến hình ảnh hoặc âm thanh tương tự. Ví dụ: "${currentItem?.example || 'Tôi sẽ tạo ví dụ cho bạn.'}"`,
-      `Grok đây! Từ "${currentItem?.japanese || 'này'}" phát âm là "${currentItem?.pronunciation || '...'}" và nghĩa là "${currentItem?.meaning || '...'}". Đơn giản như Elon Musk nói về AI vậy! 😄`
+      `Ah, từ "${(currentItem as VocabularyItem)?.japanese || 'này'}"! 🤓 Đây là một từ rất thú vị trong ${userLevel}. Nghĩa là "${(currentItem as VocabularyItem)?.meaning || '...'}" - khá đơn giản phải không?`,
+      `Từ "${(currentItem as VocabularyItem)?.japanese || 'này'}" có nghĩa là "${(currentItem as VocabularyItem)?.meaning || '...'}"! 💡 Mẹo nhỏ: Hãy liên tưởng đến hình ảnh hoặc âm thanh tương tự. Ví dụ: "${(currentItem as VocabularyItem)?.example || 'Tôi sẽ tạo ví dụ cho bạn.'}"`,
+      `Grok đây! Từ "${(currentItem as VocabularyItem)?.japanese || 'này'}" phát âm là "${(currentItem as VocabularyItem)?.pronunciation || '...'}" và nghĩa là "${(currentItem as VocabularyItem)?.meaning || '...'}". Đơn giản như Elon Musk nói về AI vậy! 😄`
     ],
     grammar: [
-      `Ngữ pháp này khá thú vị! 🎯 Cấu trúc: "${currentItem?.pattern || 'Danh từ + は + Tính từ/Động từ'}". Đừng quên particle は nhé - nó quan trọng như Tesla trong thế giới xe điện!`,
-      `Grok giải thích: ${currentItem?.usage || 'Ngữ pháp này dùng để biểu đạt ý nghĩa cụ thể.'} Lỗi thường gặp? Quên particle hoặc sai thứ tự từ. Nhưng đừng lo, ai cũng mắc lỗi! 😉`,
-      `Cấu trúc này: "${currentItem?.pattern || '...'}" - đơn giản như SpaceX landing! 🚀 Hãy luyện tập nhiều và đừng sợ mắc lỗi. Mỗi lỗi là một bước tiến!`
+      `Ngữ pháp này khá thú vị! 🎯 Cấu trúc: "${(currentItem as GrammarItem)?.pattern || 'Danh từ + は + Tính từ/Động từ'}". Đừng quên particle は nhé - nó quan trọng như Tesla trong thế giới xe điện!`,
+      `Grok giải thích: ${(currentItem as GrammarItem)?.usage || 'Ngữ pháp này dùng để biểu đạt ý nghĩa cụ thể.'} Lỗi thường gặp? Quên particle hoặc sai thứ tự từ. Nhưng đừng lo, ai cũng mắc lỗi! 😉`,
+      `Cấu trúc này: "${(currentItem as GrammarItem)?.pattern || '...'}" - đơn giản như SpaceX landing! 🚀 Hãy luyện tập nhiều và đừng sợ mắc lỗi. Mỗi lỗi là một bước tiến!`
     ],
     kanji: [
-      `Kanji "${currentItem?.character || 'này'}" - đây là một kanji cơ bản! 📝 Nghĩa: "${currentItem?.meaning || '...'}", Onyomi: "${currentItem?.onyomi || '...'}", Kunyomi: "${currentItem?.kunyomi || '...'}". ${currentItem?.strokeCount || '2'} nét thôi, dễ như đếm từ 1 đến 10!`,
-      `Grok đây! Kanji "${currentItem?.character || 'này'}" có ${currentItem?.strokeCount || '2'} nét. Thứ tự viết: từ trên xuống dưới, từ trái sang phải. Như viết code vậy - có quy tắc rõ ràng! 💻`,
-      `Kanji "${currentItem?.character || 'này'}" - nghĩa là "${currentItem?.meaning || '...'}". Bộ thủ: ${currentItem?.radicals?.join(', ') || 'Tôi sẽ giải thích bộ thủ cho bạn.'} Hiểu bộ thủ giúp ghi nhớ dễ dàng hơn, như hiểu thuật toán vậy! 🧠`
+      `Kanji "${(currentItem as KanjiItem)?.character || 'này'}" - đây là một kanji cơ bản! 📝 Nghĩa: "${(currentItem as KanjiItem)?.meaning || '...'}", Onyomi: "${(currentItem as KanjiItem)?.onyomi || '...'}", Kunyomi: "${(currentItem as KanjiItem)?.kunyomi || '...'}". ${(currentItem as KanjiItem)?.strokeCount || '2'} nét thôi, dễ như đếm từ 1 đến 10!`,
+      `Grok đây! Kanji "${(currentItem as KanjiItem)?.character || 'này'}" có ${(currentItem as KanjiItem)?.strokeCount || '2'} nét. Thứ tự viết: từ trên xuống dưới, từ trái sang phải. Như viết code vậy - có quy tắc rõ ràng! 💻`,
+      `Kanji "${(currentItem as KanjiItem)?.character || 'này'}" - nghĩa là "${(currentItem as KanjiItem)?.meaning || '...'}". Bộ thủ: ${(currentItem as KanjiItem)?.radicals?.join(', ') || 'Tôi sẽ giải thích bộ thủ cho bạn.'} Hiểu bộ thủ giúp ghi nhớ dễ dàng hơn, như hiểu thuật toán vậy! 🧠`
     ]
   };
   

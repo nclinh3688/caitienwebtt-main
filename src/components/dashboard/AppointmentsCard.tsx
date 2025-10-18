@@ -3,8 +3,16 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { FaCalendarAlt, FaClock } from 'react-icons/fa';
 
+interface Appointment {
+  id: string;
+  status: string;
+  notes: string;
+  startTime: string | number | Date;
+  endTime: string | number | Date;
+}
+
 interface AppointmentsCardProps {
-  appointments: any[]; // Consider defining a more specific interface for appointments
+  appointments: Appointment[];
 }
 
 export function AppointmentsCard({ appointments }: AppointmentsCardProps) {
@@ -19,7 +27,7 @@ export function AppointmentsCard({ appointments }: AppointmentsCardProps) {
       <CardContent>
         <div className="space-y-3">
           {appointments.length > 0 ? (
-            appointments.map((item: any) => (
+            appointments.map((item: Appointment) => (
               <div key={item.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                 <div className={`w-2 h-2 rounded-full mt-2 ${
                   item.status === 'scheduled' ? 'bg-blue-500' : 'bg-red-500'

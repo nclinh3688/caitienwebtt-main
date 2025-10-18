@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+interface ProgressData {
+  userId: string;
+  stepId: string;
+  completed: boolean;
+  timeSpent: number;
+  difficulty: string;
+  timestamp: Date;
+  sessionId: string;
+}
+
+interface AIAdjustments {
+  paceAssessment: string;
+  difficultyAdjustment: number;
+  timeAllocationSuggestion: number;
+  focusAreasRecommended: string[];
+  motivationalMessage: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -17,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log progress for AI learning path optimization
-    const progressData = {
+    const progressData: ProgressData = {
       userId: session.user.email,
       stepId,
       completed: completed || false,
@@ -56,9 +74,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function analyzeProgressAndAdjust(progressData: any) {
+async function analyzeProgressAndAdjust(progressData: ProgressData): Promise<AIAdjustments> {
   // AI analysis of learning progress and path adjustments
-  const analysis = {
+  const analysis: AIAdjustments = {
     paceAssessment: 'optimal', // fast, optimal, slow
     difficultyAdjustment: 0, // -1: easier, 0: same, 1: harder
     timeAllocationSuggestion: progressData.timeSpent,
@@ -80,7 +98,7 @@ async function analyzeProgressAndAdjust(progressData: any) {
   return analysis;
 }
 
-async function updateLearningPath(progressData: any, aiAdjustments: any) {
+async function updateLearningPath(progressData: ProgressData, aiAdjustments: AIAdjustments) {
   // Update the user's learning path based on AI analysis
   if (process.env.NODE_ENV === 'development') console.log('🔄 Updating learning path based on AI analysis:', {
     userId: progressData.userId,
@@ -94,7 +112,7 @@ async function updateLearningPath(progressData: any, aiAdjustments: any) {
   // 4. Update AI recommendations
 }
 
-function generateNextRecommendations(progressData: any) {
+function generateNextRecommendations(progressData: ProgressData) {
   return {
     immediate: 'Continue to next step in your learning path',
     studyTip: 'Review completed material before starting new content',

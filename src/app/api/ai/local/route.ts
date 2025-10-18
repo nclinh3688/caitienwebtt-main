@@ -1,5 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface LocalAIContext {
+  pageType: 'vocabulary' | 'grammar' | 'kanji' | string;
+  currentItem?: {
+    japanese?: string;
+    meaning?: string;
+    pronunciation?: string;
+    example?: string;
+    pattern?: string;
+    usage?: string;
+    character?: string;
+    onyomi?: string;
+    kunyomi?: string;
+    strokeCount?: number;
+    radicals?: string[];
+  };
+  userLevel?: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { question, context } = await request.json();
@@ -25,7 +43,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function generateLocalResponse(question: string, context: any): string {
+function generateLocalResponse(question: string, context: LocalAIContext): string {
   const { pageType, currentItem, userLevel = 'N5' } = context;
   
   // Analyze question keywords

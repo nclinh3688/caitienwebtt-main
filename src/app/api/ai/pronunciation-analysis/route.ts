@@ -10,6 +10,11 @@ interface PronunciationAnalysisRequest {
   attempt: number;
 }
 
+interface MockAnalysisData {
+  targetText?: string;
+  userSpeech?: string;
+}
+
 interface PronunciationAnalysis {
   overallScore: number;
   wordScores: Array<{
@@ -34,9 +39,16 @@ interface PronunciationAnalysis {
 }
 
 export async function POST(request: NextRequest) {
+  let requestData: PronunciationAnalysisRequest | null = null;
   try {
     const session = await getServerSession(authOptions);
-    const { targetText, userSpeech, language, difficulty, attempt }: PronunciationAnalysisRequest = await request.json();
+    requestData = await request.json();
+
+    if (!requestData) {
+      return NextResponse.json({ error: 'Invalid request data' }, { status: 400 });
+    }
+
+    const { targetText, userSpeech, language, difficulty, attempt } = requestData;
 
     if (!targetText || !userSpeech) {
       return NextResponse.json({ error: 'Target text and user speech are required' }, { status: 400 });
@@ -72,7 +84,7 @@ export async function POST(request: NextRequest) {
 Return JSON format với detailed analysis.`;
 
     // Call Google Gemini for pronunciation analysis
-    const analysis = await generateAIPronunciationAnalysis(aiPrompt, targetText, userSpeech, language);
+    const analysis = await generateAIPronunciationAnalysis(aiPrompt, targetText, userSpeech);
 
     // Enhanced with learning analytics
     const enhancedAnalysis = await enhanceAnalysisWithProgress(analysis, session?.user?.email || undefined);
@@ -86,7 +98,10 @@ Return JSON format với detailed analysis.`;
     if (process.env.NODE_ENV === 'development') console.error('Pronunciation Analysis Error:', error);
     
     // Fallback to sophisticated mock analysis
-    const fallbackAnalysis = generateAdvancedMockAnalysis(request.body);
+    const fallbackAnalysis = generateAdvancedMockAnalysis({
+      targetText: requestData?.targetText,
+      userSpeech: requestData?.userSpeech,
+    });
     
     return NextResponse.json(fallbackAnalysis);
   }
@@ -95,8 +110,7 @@ Return JSON format với detailed analysis.`;
 async function generateAIPronunciationAnalysis(
   prompt: string, 
   targetText: string, 
-  userSpeech: string, 
-  language: string
+  userSpeech: string
 ): Promise<PronunciationAnalysis> {
   try {
     // Use Google Gemini for pronunciation analysis
@@ -154,7 +168,7 @@ function parseAIResponseToPronunciation(aiResponse: string, targetText: string, 
   return generateAdvancedMockAnalysis({ targetText, userSpeech });
 }
 
-function generateAdvancedMockAnalysis(data: any): PronunciationAnalysis {
+function generateAdvancedMockAnalysis(data: MockAnalysisData): PronunciationAnalysis {
   const { targetText = "こんにちは", userSpeech = "konnichiwa" } = data;
   
   // Calculate similarity-based scoring
@@ -162,19 +176,19 @@ function generateAdvancedMockAnalysis(data: any): PronunciationAnalysis {
   const baseScore = Math.round(similarity * 100);
   
   // Language-specific analysis
-  const languageFactors = getLanguageSpecificFactors(targetText);
+  getLanguageSpecificFactors(targetText);
   
   // Generate word-level analysis
   const words = targetText.split(/[\s\u3000]+/); // Handle Japanese space
   const wordScores = words.map((word: string, index: number) => {
-    const wordSimilarity = calculateWordSimilarity(word, userSpeech, index, words.length);
+    calculateWordSimilarity(word, userSpeech, index, words.length);
     const wordScore = Math.max(baseScore + (Math.random() * 20 - 10), 60);
     
     return {
       word,
       score: Math.round(wordScore),
       feedback: generateWordFeedback(wordScore),
-      improvement: generateWordImprovement(word, wordScore)
+      improvement: generateWordImprovement()
     };
   });
 
@@ -258,10 +272,9 @@ function jaroWinklerSimilarity(s1: string, s2: string): number {
   
   const len1 = s1.length;
   const len2 = s2.length;
-  const matchWindow = Math.floor(Math.max(len1, len2) / 2) - 1;
   
   let matches = 0;
-  let transpositions = 0;
+  const transpositions = 0;
   
   // Simple approximation
   for (let i = 0; i < Math.min(len1, len2); i++) {
@@ -315,7 +328,7 @@ function generateWordFeedback(score: number): string {
   return 'Needs improvement, try again 💪';
 }
 
-function generateWordImprovement(word: string, score: number): string {
+function generateWordImprovement(): string {
   const improvements = [
     'Focus on the first syllable',
     'Emphasize the consonant sounds',
@@ -383,7 +396,7 @@ async function enhanceAnalysisWithProgress(analysis: PronunciationAnalysis, user
       analysis.insights = {
         improvement: calculateImprovement(analysis.overallScore),
         nextSteps: generateNextSteps(analysis),
-        encouragement: generateEncouragement(analysis.overallScore)
+        encouragement: generateEncouragement()
       };
     } catch (error) {
       if (process.env.NODE_ENV === 'development') console.error('Error enhancing analysis with progress:', error);
@@ -420,7 +433,7 @@ function generateNextSteps(analysis: PronunciationAnalysis): string[] {
   return steps;
 }
 
-function generateEncouragement(score: number): string {
+function generateEncouragement(): string {
   const encouragements = [
     'Great effort! Every practice session makes you better! 🌟',
     'You\'re doing awesome! Keep up the excellent work! 💪',

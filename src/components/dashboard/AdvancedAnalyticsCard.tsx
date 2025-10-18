@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -8,8 +8,6 @@ import { Button } from '@/components/ui/button';
 import { 
   FaChartBar, 
   FaChartLine, 
-  FaBrain, 
-  FaCalendarAlt,
   FaArrowUp,
   FaArrowDown,
   FaBullseye,
@@ -43,24 +41,23 @@ interface WeakPointDetail {
   recommendedAction: string;
 }
 
-interface AdvancedAnalyticsProps {
-  userId: string;
-  overallProgress?: any;
-  aiProgressAnalysis?: any;
+interface AIProgressAnalysis {
+  overallAssessment?: string;
 }
 
-export function AdvancedAnalyticsCard({ userId, overallProgress, aiProgressAnalysis }: AdvancedAnalyticsProps) {
+interface AdvancedAnalyticsProps {
+  userId: string;
+  aiProgressAnalysis?: AIProgressAnalysis;
+}
+
+export function AdvancedAnalyticsCard({ userId, aiProgressAnalysis }: AdvancedAnalyticsProps) {
   const [skillAnalysis, setSkillAnalysis] = useState<SkillAnalysis | null>(null);
   const [learningVelocity, setLearningVelocity] = useState<LearningVelocity | null>(null);
   const [weakPoints, setWeakPoints] = useState<WeakPointDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'skills' | 'velocity' | 'weakpoints'>('skills');
 
-  useEffect(() => {
-    fetchAdvancedAnalytics();
-  }, [userId]);
-
-  const fetchAdvancedAnalytics = async () => {
+  const fetchAdvancedAnalytics = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/analytics/advanced', {
@@ -120,7 +117,11 @@ export function AdvancedAnalyticsCard({ userId, overallProgress, aiProgressAnaly
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchAdvancedAnalytics();
+  }, [fetchAdvancedAnalytics]);
 
   const getSkillColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-100';

@@ -1,27 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   FaCalendar, 
-  FaClock, 
   FaPlay, 
-  FaPause, 
   FaCheck,
-  FaTimes,
-  FaExclamationTriangle,
-  FaLightbulb,
-  FaRocket,
   FaBullseye,
   FaBookOpen,
-  FaHeadphones,
   FaPen,
-  FaMicrophone,
-  FaTrophy,
-  FaPlus,
   FaEdit,
   FaRobot
 } from 'react-icons/fa';
@@ -63,35 +53,12 @@ interface WeeklyGoal {
 }
 
 export default function AdvancedStudySchedule() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate] = useState(new Date());
   const [schedules, setSchedules] = useState<DailySchedule[]>([]);
   const [weeklyGoals, setWeeklyGoals] = useState<WeeklyGoal[]>([]);
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    initializeSchedule();
-  }, []);
-
-  const initializeSchedule = async () => {
-    try {
-      const response = await fetch('/api/dashboard/advanced/schedule/public');
-      if (response.ok) {
-        const data = await response.json();
-        setSchedules(data.dailyStats || []);
-        setWeeklyGoals(data.weeklyGoals || []);
-      } else {
-        console.error('Failed to fetch schedule');
-        // Fallback to mock data if API fails
-        initializeMockData();
-      }
-    } catch (error) {
-      console.error('Error fetching schedule:', error);
-      // Fallback to mock data if API fails
-      initializeMockData();
-    }
-  };
-
-  const initializeMockData = () => {
+  const initializeMockData = useCallback(() => {
     const mockSchedules: DailySchedule[] = [];
     const mockGoals: WeeklyGoal[] = [
       {
@@ -168,17 +135,30 @@ export default function AdvancedStudySchedule() {
 
     setSchedules(mockSchedules);
     setWeeklyGoals(mockGoals);
-  };
+  }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800 border-green-200';
-      case 'in_progress': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'scheduled': return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'skipped': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  const initializeSchedule = useCallback(async () => {
+    try {
+      const response = await fetch('/api/dashboard/advanced/schedule/public');
+      if (response.ok) {
+        const data = await response.json();
+        setSchedules(data.dailyStats || []);
+        setWeeklyGoals(data.weeklyGoals || []);
+      } else {
+        console.error('Failed to fetch schedule');
+        // Fallback to mock data if API fails
+        initializeMockData();
+      }
+    } catch (error) {
+      console.error('Error fetching schedule:', error);
+      // Fallback to mock data if API fails
+      initializeMockData();
     }
-  };
+  }, [initializeMockData]);
+
+  useEffect(() => {
+    initializeSchedule();
+  }, [initializeSchedule]);
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -219,14 +199,6 @@ export default function AdvancedStudySchedule() {
     totalStudyTime: 0,
     completedSessions: 0,
     totalSessions: 0
-  };
-
-  const getDayName = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const today = new Date();
-    
-    if (dateStr === today.toISOString().split('T')[0]) return 'Hôm nay';
-    return date.toLocaleDateString('vi-VN', { weekday: 'long' });
   };
 
   return (

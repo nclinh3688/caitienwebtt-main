@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,62 +8,13 @@ import { Progress } from '@/components/ui/progress';
 import { 
   FaBrain, 
   FaLightbulb, 
-  FaRocket, 
   FaChartLine, 
-  FaBullseye,
-  FaClock,
-  FaStar,
-  FaCheckCircle,
   FaExclamationTriangle,
-  FaArrowUp,
-  FaArrowDown,
-  FaMinus,
-  FaPlay,
-  FaPause,
-  FaRedo,
-  FaDownload,
-  FaShare,
-  FaEye,
-  FaEyeSlash,
-  FaCog,
-  FaMagic,
-  FaRobot,
-  FaGraduationCap,
-  FaBookOpen,
-  FaHeadphones,
-  FaPen,
-  FaMicrophone,
   FaTrophy,
-  FaFire,
-  FaUsers,
-  FaCalendar,
-  FaBell,
-  FaHeart,
-  FaGift,
-  FaCrown,
-  FaMedal,
-  FaAward,
-  FaCertificate,
-  FaFlag,
-  FaMap,
-  FaCompass,
-  FaRoute,
-  FaSign,
-  FaTrafficLight,
-  FaStop,
-  FaPauseCircle,
-  FaPlayCircle,
-  FaStopCircle,
-  FaCircle,
-  FaSearch,
-  FaFilter,
-  FaSort,
-  FaSortUp,
-  FaSortDown,
-  FaThumbsUp,
-  FaThumbsDown
+  FaRobot,
+  FaArrowUp
 } from 'react-icons/fa';
-import { HiSparkles, HiLightningBolt, HiTrendingUp, HiTrendingDown } from 'react-icons/hi';
+import { HiSparkles } from 'react-icons/hi';
 
 interface AIInsight {
   id: string;
@@ -100,6 +51,13 @@ interface AIPrediction {
   factors: string[];
 }
 
+// Helper component for crystal ball icon
+const FaCrystalBall = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+  </svg>
+);
+
 export default function AdvancedAIInsights() {
   const [insights, setInsights] = useState<AIInsight[]>([]);
   const [patterns, setPatterns] = useState<LearningPattern[]>([]);
@@ -108,44 +66,7 @@ export default function AdvancedAIInsights() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedInsight, setSelectedInsight] = useState<AIInsight | null>(null);
 
-  useEffect(() => {
-    initializeAIInsights();
-  }, []);
-
-  // Debug state changes
-  useEffect(() => {
-    console.log('🔄 State updated:');
-    console.log('🤖 Insights:', insights);
-    console.log('📈 Patterns:', patterns);
-    console.log('🔮 Predictions:', predictions);
-  }, [insights, patterns, predictions]);
-
-  const initializeAIInsights = async () => {
-    try {
-      console.log('🔍 Fetching AI insights from API...');
-      const response = await fetch('/api/dashboard/advanced/insights/public');
-      if (response.ok) {
-        const data = await response.json();
-        console.log('📊 API Response:', data);
-        console.log('🤖 Insights count:', data.insights?.length || 0);
-        console.log('📈 Patterns count:', data.patterns?.length || 0);
-        console.log('🔮 Predictions count:', data.predictions?.length || 0);
-        setInsights(data.insights || []);
-        setPatterns(data.patterns || []);
-        setPredictions(data.predictions || []);
-      } else {
-        console.error('❌ Failed to fetch insights');
-        // Fallback to mock data if API fails
-        initializeMockData();
-      }
-    } catch (error) {
-      console.error('❌ Error fetching insights:', error);
-      // Fallback to mock data if API fails
-      initializeMockData();
-    }
-  };
-
-  const initializeMockData = () => {
+  const initializeMockData = useCallback(() => {
     // Mock AI Insights Data (fallback)
     const mockInsights: AIInsight[] = [
       {
@@ -205,7 +126,43 @@ export default function AdvancedAIInsights() {
     setInsights(mockInsights);
     setPatterns(mockPatterns);
     setPredictions(mockPredictions);
-  };
+  }, []);
+
+  useEffect(() => {
+    const initializeAIInsights = async () => {
+      try {
+        console.log('🔍 Fetching AI insights from API...');
+        const response = await fetch('/api/dashboard/advanced/insights/public');
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📊 API Response:', data);
+          console.log('🤖 Insights count:', data.insights?.length || 0);
+          console.log('📈 Patterns count:', data.patterns?.length || 0);
+          console.log('🔮 Predictions count:', data.predictions?.length || 0);
+          setInsights(data.insights || []);
+          setPatterns(data.patterns || []);
+          setPredictions(data.predictions || []);
+        } else {
+          console.error('❌ Failed to fetch insights');
+          // Fallback to mock data if API fails
+          initializeMockData();
+        }
+      } catch (error) {
+        console.error('❌ Error fetching insights:', error);
+        // Fallback to mock data if API fails
+        initializeMockData();
+      }
+    };
+    initializeAIInsights();
+  }, [initializeMockData]);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log('🔄 State updated:');
+    console.log('🤖 Insights:', insights);
+    console.log('📈 Patterns:', patterns);
+    console.log('🔮 Predictions:', predictions);
+  }, [insights, patterns, predictions]);
 
   const getInsightIcon = (type: string) => {
     switch (type) {
@@ -527,10 +484,3 @@ export default function AdvancedAIInsights() {
     </div>
   );
 }
-
-// Helper component for crystal ball icon
-const FaCrystalBall = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-  </svg>
-);

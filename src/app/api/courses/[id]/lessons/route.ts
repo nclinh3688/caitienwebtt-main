@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
+interface LessonWhereClause {
+  courseId: string;
+  isPublished?: boolean;
+}
+
 const prisma = new PrismaClient();
 
 // GET /api/courses/[id]/lessons - Get all lessons for a course
@@ -25,7 +30,7 @@ export async function GET(
       );
     }
 
-    const where: any = { courseId: id };
+    const where: LessonWhereClause = { courseId: id };
     if (published) where.isPublished = published === 'true';
 
     const lessons = await prisma.lesson.findMany({

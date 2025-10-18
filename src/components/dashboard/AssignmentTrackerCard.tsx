@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,11 +12,9 @@ import {
   FaCheckCircle,
   FaBook,
   FaPen,
-  FaHeadphones,
   FaMicrophone,
   FaPlus,
   FaBell,
-  FaFire,
   FaBullseye
 } from 'react-icons/fa';
 
@@ -52,13 +50,8 @@ export function AssignmentTrackerCard({ userId }: AssignmentTrackerProps) {
   const [reminders, setReminders] = useState<StudyReminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'assignments' | 'reminders'>('assignments');
-  const [showCreateForm, setShowCreateForm] = useState(false);
 
-  useEffect(() => {
-    fetchAssignments();
-  }, [userId]);
-
-  const fetchAssignments = async () => {
+  const fetchAssignments = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/assignments', {
@@ -138,49 +131,17 @@ export function AssignmentTrackerCard({ userId }: AssignmentTrackerProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchAssignments();
+  }, [fetchAssignments]);
 
   const getDaysUntilDue = (dueDate: Date) => {
     const now = new Date();
     const diffTime = dueDate.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'border-red-500 bg-red-50 text-red-700';
-      case 'medium': return 'border-yellow-500 bg-yellow-50 text-yellow-700';
-      case 'low': return 'border-green-500 bg-green-50 text-green-700';
-      default: return 'border-gray-500 bg-gray-50 text-gray-700';
-    }
-  };
-
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
-      case 'high': return <FaExclamationTriangle className="text-red-500" />;
-      case 'medium': return <FaClock className="text-yellow-500" />;
-      case 'low': return <FaCheckCircle className="text-green-500" />;
-      default: return null;
-    }
-  };
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'lesson': return <FaBook className="text-blue-500" />;
-      case 'practice': return <FaMicrophone className="text-purple-500" />;
-      case 'test': return <FaPen className="text-red-500" />;
-      case 'review': return <FaBullseye className="text-orange-500" />;
-      default: return <FaBook className="text-gray-500" />;
-    }
-  };
-
-  const getDueDateColor = (dueDate: Date) => {
-    const days = getDaysUntilDue(dueDate);
-    if (days < 0) return 'text-red-600'; // Overdue
-    if (days <= 1) return 'text-red-500'; // Due soon
-    if (days <= 3) return 'text-yellow-500'; // Due this week
-    return 'text-gray-600'; // Normal
   };
 
   const markAsCompleted = async (assignmentId: string) => {
@@ -204,10 +165,6 @@ export function AssignmentTrackerCard({ userId }: AssignmentTrackerProps) {
     } catch (error) {
       console.error('Failed to mark assignment as completed:', error);
     }
-  };
-
-  const createCustomAssignment = () => {
-    setShowCreateForm(true);
   };
 
   if (loading) {
@@ -244,7 +201,7 @@ export function AssignmentTrackerCard({ userId }: AssignmentTrackerProps) {
           </CardTitle>
           
           <Button
-            onClick={createCustomAssignment}
+            onClick={() => {}}
             size="sm"
             className="flex items-center gap-2"
           >

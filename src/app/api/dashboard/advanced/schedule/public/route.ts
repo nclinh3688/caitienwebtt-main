@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { StudySession } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Group sessions by date
-    const sessionsByDate = studySessions.reduce((acc: Record<string, typeof studySessions>, session: any) => {
+    const sessionsByDate = studySessions.reduce((acc: Record<string, StudySession[]>, session: StudySession) => {
       const dateKey = session.scheduledDate.toISOString().split('T')[0];
       if (!acc[dateKey]) {
         acc[dateKey] = [];
@@ -41,12 +42,12 @@ export async function GET(request: NextRequest) {
     }, {} as Record<string, typeof studySessions>);
 
     // Calculate daily stats
-    const dailyStats = Object.entries(sessionsByDate).map(([date, sessions]: [string, any]) => {
+    const dailyStats = Object.entries(sessionsByDate).map(([date, sessions]: [string, StudySession[]]) => {
       const totalStudyTime = sessions
-        .filter((s: any) => s.type !== 'break')
-        .reduce((sum: number, s: any) => sum + s.duration, 0);
+        .filter((s: StudySession) => s.type !== 'break')
+        .reduce((sum: number, s: StudySession) => sum + s.duration, 0);
       
-      const completedSessions = sessions.filter((s: any) => s.status === 'completed').length;
+      const completedSessions = sessions.filter((s: StudySession) => s.status === 'completed').length;
       const totalSessions = sessions.length;
 
       return {

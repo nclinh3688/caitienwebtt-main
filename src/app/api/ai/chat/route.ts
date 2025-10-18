@@ -5,14 +5,18 @@ import { authOptions } from '@/lib/auth';
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    const { message, language, context, previousMessages } = await request.json();
+
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { message, language, previousMessages } = await request.json();
 
     if (!message?.trim()) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
     // Build conversation context
-    const conversationHistory = previousMessages?.slice(-3)?.map((msg: any) => 
+    const conversationHistory = previousMessages?.slice(-3)?.map((msg: { type: string; content: string }) => 
       `${msg.type === 'user' ? 'Học viên' : 'AI'}: ${msg.content}`
     ).join('\n') || '';
 
@@ -46,14 +50,14 @@ HỌC VIÊN HỎI: "${message}"
 HÃY TRỢ GIÚP HỌC VIÊN:`;
 
     // Call AI service (Google Gemini)
-    const aiResponse = await generateAIResponse(systemPrompt, message, language);
+    const aiResponse = await generateAIResponse(systemPrompt, message);
 
     // Enhanced response with metadata
     const response = {
       response: aiResponse,
       detectedLanguage: detectLanguage(message),
       topic: detectTopic(message),
-      suggestions: generateSuggestions(message, language),
+      suggestions: generateSuggestions(message),
       timestamp: new Date().toISOString()
     };
 
@@ -65,14 +69,14 @@ HÃY TRỢ GIÚP HỌC VIÊN:`;
     if (process.env.NODE_ENV === 'development') {
       console.error('AI Chat Error:', error);
     }
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Internal server error',
       response: '❌ Xin lỗi, hệ thống AI tạm thời gặp sự cố. Hãy thử lại sau vài phút hoặc liên hệ support để được hỗ trợ nhanh nhất! 🙏'
     }, { status: 500 });
   }
 }
 
-async function generateAIResponse(prompt: string, message: string, language?: string): Promise<string> {
+async function generateAIResponse(prompt: string, message: string): Promise<string> {
   try {
     // Use Google Gemini API (replace with your actual implementation)
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GOOGLE_AI_API_KEY, {
@@ -107,15 +111,15 @@ async function generateAIResponse(prompt: string, message: string, language?: st
 
     const data = await response.json();
     return data.candidates?.[0]?.content?.parts?.[0]?.text || 
-           generateFallbackResponse(message, language);
+           generateFallbackResponse(message);
 
   } catch (error) {
     if (process.env.NODE_ENV === 'development') console.error('Gemini API Error:', error);
-    return generateFallbackResponse(message, language);
+    return generateFallbackResponse(message);
   }
 }
 
-function generateFallbackResponse(message: string, language?: string): string {
+function generateFallbackResponse(message: string): string {
   // Smart fallback responses based on keywords
   const lowerMessage = message.toLowerCase();
   
@@ -221,7 +225,7 @@ function detectTopic(message: string): string {
   return 'general';
 }
 
-function generateSuggestions(message: string, language?: string): string[] {
+function generateSuggestions(message: string): string[] {
   const topic = detectTopic(message);
   
   const suggestions: { [key: string]: string[] } = {

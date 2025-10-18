@@ -1,12 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { callOpenAI, callGemini, callClaude, callGrokAI, callLocalAI } from '@/lib/ai-service';
 
+interface AIResponseData {
+  content?: string;
+  confidence?: number;
+  model?: string;
+  usage?: any; // This might still be 'any' if usage varies greatly
+  provider?: string;
+  responseTime?: number;
+  source?: string;
+  success?: boolean;
+  message?: string;
+  error?: string;
+}
+
+interface TestContext {
+  pageType: 'vocabulary' | 'grammar' | 'kanji' | 'listening';
+  currentItem: {
+    japanese: string;
+    meaning: string;
+    pronunciation: string;
+    example: string;
+  };
+  category: string;
+  userLevel: 'N5' | 'N4' | 'N3' | 'N2' | 'N1';
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { question = 'Xin chào, bạn có thể giúp tôi học tiếng Nhật không?' } = await request.json();
 
-    const testContext = {
-      pageType: 'vocabulary' as const,
+    const testContext: TestContext = {
+      pageType: 'vocabulary',
       currentItem: {
         japanese: 'こんにちは',
         meaning: 'Xin chào',
@@ -14,13 +39,13 @@ export async function POST(request: NextRequest) {
         example: 'こんにちは、お元気ですか？'
       },
       category: 'Chào hỏi',
-      userLevel: 'N5' as const
+      userLevel: 'N5'
     };
 
     const results: {
       [key: string]: { 
         status: 'pending' | 'success' | 'error'; 
-        response: any; 
+        response: AIResponseData | null; 
         error: string | null; 
       }
     } = {

@@ -1,32 +1,5 @@
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  FaBuilding, 
-  FaEye, 
-  FaHeart, 
-  FaUsers, 
-  FaHistory, 
-  FaTrophy,
-  FaVideo,
-  FaImage,
-  FaPhone,
-  FaEnvelope,
-  FaMapMarkerAlt,
-  FaFacebook,
-  FaYoutube,
-  FaInstagram,
-  FaRobot,
-  FaLightbulb,
-  FaStar,
-  FaGraduationCap,
-  FaGlobe,
-  FaHandshake,
-  FaPlay
-} from 'react-icons/fa';
-
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 pt-20">

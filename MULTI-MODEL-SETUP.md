@@ -61,7 +61,7 @@ yarn dev
 - **GPT-3.5 Turbo**: Ổn định (3 req/giờ)  
 - **Gemini 1.5 Flash**: Nhanh (15 req/giờ)
 - **Gemini 1.5 Pro**: Thông minh (2 req/giờ)
-- **Ollama Local**: Fallback (không giới hạn)
+
 
 ### 2. Smart Fallback System
 - Tự động chuyển model khi lỗi

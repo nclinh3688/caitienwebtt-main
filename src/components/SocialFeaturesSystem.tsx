@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FaTrophy, 
   FaCrown, 
@@ -13,83 +13,139 @@ import {
   FaHeart,
   FaComment,
   FaUserPlus,
-  FaCheck,
-  FaTimes,
+  FaUserCheck,
   FaChartBar,
   FaUsers,
   FaEnvelope,
-  FaUserCheck,
   FaGift
 } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-// Imports cleaned up
-// Imports cleaned up
-// Imports cleaned up
-// Imports cleaned up
-// Icons imported as needed
+
+// Type definitions for data structures
+interface LeaderboardUser {
+  id: string;
+  name: string;
+  avatar?: string;
+  points: number;
+  level: number;
+  streak: number;
+  achievements: number;
+  rank: number;
+  category: 'overall' | 'weekly' | 'monthly';
+}
+
+interface Friend {
+  id: string;
+  name: string;
+  avatar?: string;
+  status: 'online' | 'offline';
+  lastActive: string;
+  level: number;
+  studying: string;
+}
+
+interface FriendRequest {
+  id: string;
+  name: string;
+  avatar?: string;
+  mutualFriends: number;
+  level: number;
+}
+
+interface FriendSuggestion {
+  id: string;
+  name: string;
+  avatar?: string;
+  mutualFriends: number;
+  level: number;
+  studying?: string;
+}
+
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  points: number;
+  earnedAt: string;
+  shared: boolean;
+}
+
+interface Activity {
+  id: string;
+  type: string;
+  user: {
+    name: string;
+    avatar?: string;
+  };
+  content: string;
+  timestamp: string;
+  likes: number;
+  comments: number;
+  shared: boolean;
+}
 
 // 🏆 LEADERBOARD SYSTEM
-export function _LeaderboardSystem(_: unknown) {
-  const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+export function LeaderboardSystem() {
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<'overall' | 'weekly' | 'monthly'>('overall');
   const [userRank, setUserRank] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchLeaderboardData = async () => {
+      try {
+        setLoading(true);
+        // Mock data - in real implementation, fetch from API
+        const mockData: LeaderboardUser[] = [
+          {
+            id: '1',
+            name: 'Nguyễn Văn A',
+            avatar: undefined,
+            points: 2840,
+            level: 8,
+            streak: 15,
+            achievements: 12,
+            rank: 1,
+            category: 'overall'
+          },
+          {
+            id: '2',
+            name: 'Trần Thị B',
+            avatar: undefined,
+            points: 2650,
+            level: 7,
+            streak: 12,
+            achievements: 10,
+            rank: 2,
+            category: 'overall'
+          },
+          {
+            id: '3',
+            name: 'Lê Văn C',
+            avatar: undefined,
+            points: 2480,
+            level: 7,
+            streak: 10,
+            achievements: 9,
+            rank: 3,
+            category: 'overall'
+          }
+        ];
+
+        setLeaderboardData(mockData);
+        setUserRank(15); // Mock user rank
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchLeaderboardData();
   }, [selectedCategory]);
-
-  const fetchLeaderboardData = async () => {
-    try {
-      setLoading(true);
-      // Mock data - in real implementation, fetch from API
-      const mockData = [
-        {
-          id: '1',
-          name: 'Nguyễn Văn A',
-          avatar: undefined,
-          points: 2840,
-          level: 8,
-          streak: 15,
-          achievements: 12,
-          rank: 1,
-          category: 'overall'
-        },
-        {
-          id: '2',
-          name: 'Trần Thị B',
-          avatar: undefined,
-          points: 2650,
-          level: 7,
-          streak: 12,
-          achievements: 10,
-          rank: 2,
-          category: 'overall'
-        },
-        {
-          id: '3',
-          name: 'Lê Văn C',
-          avatar: undefined,
-          points: 2480,
-          level: 7,
-          streak: 10,
-          achievements: 9,
-          rank: 3,
-          category: 'overall'
-        }
-      ];
-
-      setLeaderboardData(mockData);
-      setUserRank(15); // Mock user rank
-    } catch (error) {
-      console.error('Error fetching leaderboard:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getRankIcon = (rank: number) => {
     if (rank === 1) return <FaCrown className="text-yellow-500 text-lg" />;
@@ -137,7 +193,7 @@ export function _LeaderboardSystem(_: unknown) {
         <div className="space-y-4">
           {/* Top 3 Podium */}
           <div className="grid grid-cols-3 gap-4 mb-6">
-            {leaderboardData.slice(0, 3).map((user, index) => (
+            {leaderboardData.slice(0, 3).map((user) => (
               <div key={user.id} className="text-center">
                 <div className={`relative mx-auto w-20 h-20 rounded-full ${getRankColor(user.rank)} p-1 mb-2`}>
                   <Avatar className="w-full h-full">
@@ -206,71 +262,71 @@ export function _LeaderboardSystem(_: unknown) {
 }
 
 // 👥 FRIEND SYSTEM
-export function _FriendSystem(_: unknown) {
-  const [friends, setFriends] = useState<any[]>([]);
-  const [friendRequests, setFriendRequests] = useState<any[]>([]);
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+export function FriendSystem() {
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [suggestions, setSuggestions] = useState<FriendSuggestion[]>([]);
   const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'suggestions'>('friends');
 
   useEffect(() => {
+    const fetchFriendData = async () => {
+      // Mock data
+      const mockFriends: Friend[] = [
+        {
+          id: '1',
+          name: 'Nguyễn Văn A',
+          avatar: undefined,
+          status: 'online',
+          lastActive: '2 phút trước',
+          level: 8,
+          studying: 'JLPT N4'
+        },
+        {
+          id: '2',
+          name: 'Trần Thị B',
+          avatar: undefined,
+          status: 'offline',
+          lastActive: '1 giờ trước',
+          level: 7,
+          studying: 'HSK 3'
+        }
+      ];
+
+      const mockRequests: FriendRequest[] = [
+        {
+          id: '3',
+          name: 'Lê Văn C',
+          avatar: undefined,
+          mutualFriends: 3,
+          level: 6
+        }
+      ];
+
+      const mockSuggestions: FriendSuggestion[] = [
+        {
+          id: '4',
+          name: 'Phạm Thị D',
+          avatar: undefined,
+          mutualFriends: 5,
+          level: 7,
+          studying: 'JLPT N3'
+        }
+      ];
+
+      setFriends(mockFriends);
+      setFriendRequests(mockRequests);
+      setSuggestions(mockSuggestions);
+    };
     fetchFriendData();
   }, []);
-
-  const fetchFriendData = async () => {
-    // Mock data
-    const mockFriends = [
-      {
-        id: '1',
-        name: 'Nguyễn Văn A',
-        avatar: undefined,
-        status: 'online',
-        lastActive: '2 phút trước',
-        level: 8,
-        studying: 'JLPT N4'
-      },
-      {
-        id: '2',
-        name: 'Trần Thị B',
-        avatar: undefined,
-        status: 'offline',
-        lastActive: '1 giờ trước',
-        level: 7,
-        studying: 'HSK 3'
-      }
-    ];
-
-    const mockRequests = [
-      {
-        id: '3',
-        name: 'Lê Văn C',
-        avatar: undefined,
-        mutualFriends: 3,
-        level: 6
-      }
-    ];
-
-    const mockSuggestions = [
-      {
-        id: '4',
-        name: 'Phạm Thị D',
-        avatar: undefined,
-        mutualFriends: 5,
-        level: 7,
-        studying: 'JLPT N3'
-      }
-    ];
-
-    setFriends(mockFriends);
-    setFriendRequests(mockRequests);
-    setSuggestions(mockSuggestions);
-  };
 
   const handleFriendRequest = (action: 'accept' | 'reject', friendId: string) => {
     const request = friendRequests.find(r => r.id === friendId);
     if (request) {
       if (action === 'accept') {
         // Add to friends
-        setFriends(prev => [...prev, request]);
+        const newFriend: Friend = { ...request, status: 'offline', lastActive: 'mới', studying: 'N/A' };
+        setFriends(prev => [...prev, newFriend]);
         // Remove from requests
         setFriendRequests(prev => prev.filter(r => r.id !== friendId));
       } else {
@@ -283,7 +339,8 @@ export function _FriendSystem(_: unknown) {
   const addFriend = (friendId: string) => {
     const suggestion = suggestions.find(s => s.id === friendId);
     if (suggestion) {
-      setFriends(prev => [...prev, suggestion]);
+      const newFriend: Friend = { ...suggestion, status: 'offline', lastActive: 'mới', studying: suggestion.studying || 'N/A' };
+      setFriends(prev => [...prev, newFriend]);
       setSuggestions(prev => prev.filter(s => s.id !== friendId));
     }
   };
@@ -411,48 +468,47 @@ export function _FriendSystem(_: unknown) {
 }
 
 // 🎁 ACHIEVEMENT SHARING
-export function _AchievementSharing(_: unknown) {
-  const [achievements, setAchievements] = useState<any[]>([]);
-  const [sharedAchievements, setSharedAchievements] = useState<any[]>([]);
+export function AchievementSharing() {
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [sharedAchievements, setSharedAchievements] = useState<Achievement[]>([]);
 
   useEffect(() => {
+    const fetchAchievements = async () => {
+      // Mock data
+      const mockAchievements: Achievement[] = [
+        {
+          id: '1',
+          title: 'Perfect Score',
+          description: 'Đạt điểm tối đa trong bài kiểm tra',
+          icon: '🏆',
+          points: 100,
+          earnedAt: '2024-01-15',
+          shared: false
+        },
+        {
+          id: '2',
+          title: 'Learning Streak',
+          description: 'Học tập 7 ngày liên tiếp',
+          icon: '🔥',
+          points: 50,
+          earnedAt: '2024-01-14',
+          shared: true
+        },
+        {
+          id: '3',
+          title: 'Grammar Master',
+          description: 'Hoàn thành tất cả bài ngữ pháp N5',
+          icon: '📚',
+          points: 75,
+          earnedAt: '2024-01-13',
+          shared: false
+        }
+      ];
+
+      setAchievements(mockAchievements);
+    };
     fetchAchievements();
   }, []);
-
-  const fetchAchievements = async () => {
-    // Mock data
-    const mockAchievements = [
-      {
-        id: '1',
-        title: 'Perfect Score',
-        description: 'Đạt điểm tối đa trong bài kiểm tra',
-        icon: '🏆',
-        points: 100,
-        earnedAt: '2024-01-15',
-        shared: false
-      },
-      {
-        id: '2',
-        title: 'Learning Streak',
-        description: 'Học tập 7 ngày liên tiếp',
-        icon: '🔥',
-        points: 50,
-        earnedAt: '2024-01-14',
-        shared: true
-      },
-      {
-        id: '3',
-        title: 'Grammar Master',
-        description: 'Hoàn thành tất cả bài ngữ pháp N5',
-        icon: '📚',
-        points: 75,
-        earnedAt: '2024-01-13',
-        shared: false
-      }
-    ];
-
-    setAchievements(mockAchievements);
-  };
 
   const shareAchievement = (achievementId: string) => {
     const achievement = achievements.find(a => a.id === achievementId);
@@ -461,7 +517,7 @@ export function _AchievementSharing(_: unknown) {
     }
   };
 
-  const getShareMessage = (achievement: any) => {
+  const getShareMessage = (achievement: Achievement) => {
     return `Tôi vừa đạt được thành tích ${achievement.title} trong khóa học tiếng Nhật! ${achievement.description} #PHUCKHIEMEDU #TiengNhat #ThanhTich`;
   };
 
@@ -541,60 +597,59 @@ export function _AchievementSharing(_: unknown) {
 }
 
 // 🌟 SOCIAL ACTIVITY FEED
-export function _SocialActivityFeed(_: unknown) {
-  const [activities, setActivities] = useState<any[]>([]);
+export function SocialActivityFeed() {
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [filter, setFilter] = useState<'all' | 'friends' | 'achievements' | 'study'>('all');
 
   useEffect(() => {
+    const fetchActivities = async () => {
+      // Mock data
+      const mockActivities: Activity[] = [
+        {
+          id: '1',
+          type: 'achievement',
+          user: {
+            name: 'Nguyễn Văn A',
+            avatar: undefined
+          },
+          content: 'vừa đạt được thành tích Perfect Score! 🏆',
+          timestamp: '2 phút trước',
+          likes: 5,
+          comments: 2,
+          shared: false
+        },
+        {
+          id: '2',
+          type: 'study',
+          user: {
+            name: 'Trần Thị B',
+            avatar: undefined
+          },
+          content: 'đã hoàn thành bài học JLPT N5 - Bài 10 📚',
+          timestamp: '15 phút trước',
+          likes: 3,
+          comments: 1,
+          shared: false
+        },
+        {
+          id: '3',
+          type: 'streak',
+          user: {
+            name: 'Lê Văn C',
+            avatar: undefined
+          },
+          content: 'đã duy trì chuỗi học tập 15 ngày liên tiếp! 🔥',
+          timestamp: '1 giờ trước',
+          likes: 8,
+          comments: 3,
+          shared: true
+        }
+      ];
+
+      setActivities(mockActivities);
+    };
     fetchActivities();
   }, []);
-
-  const fetchActivities = async () => {
-    // Mock data
-    const mockActivities = [
-      {
-        id: '1',
-        type: 'achievement',
-        user: {
-          name: 'Nguyễn Văn A',
-          avatar: undefined
-        },
-        content: 'vừa đạt được thành tích Perfect Score! 🏆',
-        timestamp: '2 phút trước',
-        likes: 5,
-        comments: 2,
-        shared: false
-      },
-      {
-        id: '2',
-        type: 'study',
-        user: {
-          name: 'Trần Thị B',
-          avatar: undefined
-        },
-        content: 'đã hoàn thành bài học JLPT N5 - Bài 10 📚',
-        timestamp: '15 phút trước',
-        likes: 3,
-        comments: 1,
-        shared: false
-      },
-      {
-        id: '3',
-        type: 'streak',
-        user: {
-          name: 'Lê Văn C',
-          avatar: undefined
-        },
-        content: 'đã duy trì chuỗi học tập 15 ngày liên tiếp! 🔥',
-        timestamp: '1 giờ trước',
-        likes: 8,
-        comments: 3,
-        shared: true
-      }
-    ];
-
-    setActivities(mockActivities);
-  };
 
   const handleLike = (activityId: string) => {
     setActivities(prev => prev.map(activity => 
@@ -621,7 +676,10 @@ export function _SocialActivityFeed(_: unknown) {
 
   const filteredActivities = activities.filter(activity => {
     if (filter === 'all') return true;
-    return activity.type === filter;
+    if (filter === 'achievements') return activity.type === 'achievement';
+    if (filter === 'study') return activity.type === 'study';
+    // 'friends' filter logic would need more implementation details
+    return false;
   });
 
   return (

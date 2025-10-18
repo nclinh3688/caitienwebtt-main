@@ -23,9 +23,32 @@ interface LearningStep {
   aiRecommendation?: string;
 }
 
+interface LearningPath {
+  id: string;
+  name: string;
+  description: string;
+  language: string;
+  level: string;
+  totalSteps: number;
+  completedSteps: number;
+  estimatedDuration: number;
+  personalizedFor: string[];
+  steps: LearningStep[];
+  aiInsights?: {
+    strengths: string[];
+    weaknesses: string[];
+    recommendations: string[];
+    predictedCompletion: string;
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const { userId, preferences, currentProgress } = await request.json();
 
     if (!preferences) {
@@ -293,7 +316,7 @@ function generateGenericPath(preferences: UserPreferences | null) {
   };
 }
 
-async function enhancePathWithAnalytics(learningPath: any, userId?: string) {
+async function enhancePathWithAnalytics(learningPath: LearningPath, userId?: string) {
   // Add user-specific analytics and insights
   if (userId) {
     try {

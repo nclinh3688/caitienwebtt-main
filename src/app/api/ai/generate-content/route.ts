@@ -54,6 +54,24 @@ interface GeneratedContent {
   };
 }
 
+interface AIContentParams {
+  language: string;
+  currentLevel: string;
+  contentType: string;
+  questionCount: number;
+  customPrompt?: string;
+}
+
+interface QuestionTemplate {
+  type: 'multiple_choice' | 'fill_blank' | 'audio' | 'speaking' | 'matching' | 'translation';
+  question: string;
+  options?: string[];
+  correctAnswer: string | string[];
+  explanation: string;
+  hints: string[];
+  audioUrl?: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -97,7 +115,7 @@ export async function POST(request: NextRequest) {
 6. **Hints**: Gợi ý thông minh không spoil answer
 
 💡 CONTENT FOCUS:
-${getContentFocus(contentType, language)}
+${getContentFocus(contentType)}
 
 🌟 QUALITY STANDARDS:
 - Authentic language usage
@@ -129,13 +147,13 @@ Tạo ${questionCount} câu hỏi chất lượng cao theo format JSON với str
     if (process.env.NODE_ENV === 'development') console.error('AI Content Generation Error:', error);
     
     // Fallback to sophisticated mock content
-    const fallbackContent = generateAdvancedMockContent(request);
+    const fallbackContent = generateAdvancedMockContent(await request.json());
     
     return NextResponse.json(fallbackContent);
   }
 }
 
-async function generateAIContent(prompt: string, params: any): Promise<GeneratedContent> {
+async function generateAIContent(prompt: string, params: AIContentParams): Promise<GeneratedContent> {
   try {
     // Use Google Gemini for content generation
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GOOGLE_AI_API_KEY, {
@@ -184,7 +202,7 @@ async function generateAIContent(prompt: string, params: any): Promise<Generated
   }
 }
 
-function parseAIResponseToContent(aiResponse: string, params: any): GeneratedContent {
+function parseAIResponseToContent(aiResponse: string, params: AIContentParams): GeneratedContent {
   // Advanced parsing of AI response to create structured content
   // This would parse the AI-generated content and convert to our data structure
   
@@ -192,7 +210,7 @@ function parseAIResponseToContent(aiResponse: string, params: any): GeneratedCon
   return generateAdvancedMockContent(params);
 }
 
-function generateAdvancedMockContent(params: any): GeneratedContent {
+function generateAdvancedMockContent(params: AIContentParams): GeneratedContent {
   const { language = 'japanese', currentLevel = 'beginner', contentType = 'mixed', questionCount = 10 } = params;
   
   // Generate content based on type and level
@@ -239,7 +257,7 @@ function generateQuestionsByType(type: string, language: string, level: string, 
       correctAnswer: template.correctAnswer,
       explanation: template.explanation,
       hints: template.hints,
-      audioUrl: (template as any).audioUrl,
+      audioUrl: template.audioUrl,
       difficulty,
       points: Math.max(difficulty * 2, 5)
     });
@@ -248,7 +266,7 @@ function generateQuestionsByType(type: string, language: string, level: string, 
   return questions;
 }
 
-function getQuestionTemplates(type: string, language: string, level: string) {
+function getQuestionTemplates(type: string, language: string, level: string): QuestionTemplate[] {
   // Japanese templates
   if (language === 'japanese') {
     if (type === 'vocabulary') {
@@ -402,7 +420,7 @@ function generateSkills(type: string): string[] {
   return skillMap[type] || ['general'];
 }
 
-function getContentFocus(type: string, language: string): string {
+function getContentFocus(type: string): string {
   const focusMap: { [key: string]: string } = {
     vocabulary: 'Essential words, kanji/characters, practical usage, memory techniques',
     grammar: 'Core structures, particles/conjunctions, sentence patterns, common mistakes',

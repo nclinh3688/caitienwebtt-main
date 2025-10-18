@@ -231,8 +231,6 @@ export class MultiModelService {
         return await this.callOpenAI(model, message, context);
       case 'google':
         return await this.callGoogle(model, message, context);
-      case 'ollama':
-        return await this.callOllama(model, message, context);
       case 'deepseek':
         return await this.chatWithDeepSeek([{ role: 'user', content: message }], model.maxTokens, model.temperature).then(res => res.response);
       case 'xai': // Added Grok provider
@@ -357,56 +355,7 @@ export class MultiModelService {
     return data.candidates[0].content.parts[0].text;
   }
 
-  private async callOllama(model: AIModel, message: string, context: string): Promise<string> {
-    const systemPrompt = `Bạn là AI Assistant chuyên gia ngôn ngữ của PHÚC KHIÊM Education. 
-
-**QUY TẮC TRẢ LỜI THÔNG MINH:**
-- Trả lời ĐÚNG NGAY LẦN ĐẦU, không cần hỏi lại
-- LUÔN tương tác với người dùng trước khi đưa nội dung
-- Hỏi người dùng muốn gì thêm sau khi trả lời chính
-
-**FORMAT TƯƠNG TÁC:**
-1. Trả lời chính xác câu hỏi của người dùng
-2. Hỏi người dùng có muốn thêm gì không
-3. Đưa ra các lựa chọn cụ thể
-
-**VÍ DỤ TƯƠNG TÁC:**
-- "Đây là 20 từ vựng N1 bạn cần. Bạn có muốn tôi lấy ví dụ câu cho từng từ không?"
-- "Tôi đã chuẩn bị 20 từ vựng N1. Bạn muốn: 1) Chỉ xem từ vựng, 2) Có thêm ví dụ câu, 3) Có thêm audio đọc?"
-
-**FORMAT TỪ VỰNG TIẾNG NHẬT:**
-- Sử dụng format: "1. 漢字 (ひらがな) - Nghĩa tiếng Việt"
-- KHÔNG có romaji, KHÔNG có phần mở đầu dài
-- KHÔNG có bảng markdown phức tạp
-
-**FORMAT NGỮ PHÁP:**
-- Liệt kê đơn giản: "1. [Cấu trúc] - [Giải thích]"
-
-**LUÔN NHỚ:** Tương tác thông minh, trả lời đúng ngay lần đầu, hỏi người dùng muốn gì thêm!`;
-
-    const response = await fetch('http://127.0.0.1:11434/api/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: model.id,
-        prompt: systemPrompt,
-        stream: false,
-        options: {
-          temperature: model.temperature,
-          num_predict: model.maxTokens
-        }
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Ollama API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.response;
-  }
+  
 
   private async chatWithDeepSeek(messages: any[], maxTokens: number, temperature: number): Promise<ModelResponse> {
     try {

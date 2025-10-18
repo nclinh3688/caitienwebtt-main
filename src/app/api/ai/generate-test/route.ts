@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Level and number of questions are required' }, { status: 400 });
     }
 
-    let prompt = `Tạo ${numQuestions} câu hỏi trắc nghiệm về ${skill ? skill + ' của ' : ''}cấp độ ${level}. Mỗi câu hỏi phải có 4 lựa chọn, một đáp án đúng và một giải thích ngắn gọn. Trả về kết quả dưới dạng một mảng JSON, mỗi đối tượng trong mảng là một câu hỏi với các trường: text (nội dung câu hỏi), options (mảng các lựa chọn), correctAnswer (đáp án đúng), explanation (giải thích).`;
+    const prompt = `Tạo ${numQuestions} câu hỏi trắc nghiệm về ${skill ? skill + ' của ' : ''}cấp độ ${level}. Mỗi câu hỏi phải có 4 lựa chọn, một đáp án đúng và một giải thích ngắn gọn. Trả về kết quả dưới dạng một mảng JSON, mỗi đối tượng trong mảng là một câu hỏi với các trường: text (nội dung câu hỏi), options (mảng các lựa chọn), correctAnswer (đáp án đúng), explanation (giải thích).`;
 
     let generatedContent = '';
 

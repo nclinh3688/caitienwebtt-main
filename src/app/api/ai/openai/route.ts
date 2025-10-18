@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+interface OpenAIContext {
+  pageType?: 'vocabulary' | 'grammar' | 'kanji' | string;
+  userLevel?: string;
+  currentItem?: {
+    japanese?: string;
+    meaning?: string;
+    pronunciation?: string;
+    example?: string;
+    pattern?: string;
+    usage?: string;
+    character?: string;
+    onyomi?: string;
+    kunyomi?: string;
+    strokeCount?: number;
+  };
+  category?: string;
+}
+
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
 });
@@ -48,7 +66,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function createSystemPrompt(context: any): string {
+function createSystemPrompt(context: OpenAIContext): string {
   const { pageType, userLevel = 'N5' } = context;
   
   const basePrompt = `Bạn là một AI Assistant chuyên gia dạy tiếng Nhật cho người Việt Nam. 
@@ -103,7 +121,7 @@ Chuyên môn: Kanji tiếng Nhật
   }
 }
 
-function createUserMessage(question: string, context: any): string {
+function createUserMessage(question: string, context: OpenAIContext): string {
   const { currentItem, category } = context;
   
   let contextInfo = '';

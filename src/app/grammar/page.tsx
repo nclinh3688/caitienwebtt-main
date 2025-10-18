@@ -1,259 +1,279 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Target, BookOpen, Star, Play, CheckCircle, Clock, Award } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import '@/styles/grammar.css';
 
-export default function GrammarPage() {
-  const [selectedLevel, setSelectedLevel] = useState('basic');
-
-  const levels = [
-    { 
-      id: 'basic', 
-      name: 'Ngữ pháp cơ bản', 
-      color: 'bg-green-500', 
-      lessons: 25, 
-      progress: 80,
-      description: 'Học các cấu trúc cơ bản nhất'
-    },
-    { 
-      id: 'intermediate', 
-      name: 'Ngữ pháp trung cấp', 
-      color: 'bg-blue-500', 
-      lessons: 40, 
-      progress: 45,
-      description: 'Nâng cao kỹ năng ngữ pháp'
-    },
-    { 
-      id: 'advanced', 
-      name: 'Ngữ pháp nâng cao', 
-      color: 'bg-purple-500', 
-      lessons: 60, 
-      progress: 20,
-      description: 'Thành thạo ngữ pháp phức tạp'
-    }
-  ];
-
-  const jlptPatterns = [
-    { name: 'JLPT N5', patterns: 50, color: 'from-green-500 to-green-600', icon: '🟢' },
-    { name: 'JLPT N4', patterns: 80, color: 'from-yellow-500 to-yellow-600', icon: '🟡' },
-    { name: 'JLPT N3', patterns: 120, color: 'from-orange-500 to-orange-600', icon: '🟠' },
-    { name: 'JLPT N2', patterns: 200, color: 'from-red-500 to-red-600', icon: '🔴' },
-    { name: 'JLPT N1', patterns: 300, color: 'from-purple-500 to-purple-600', icon: '⚫' }
-  ];
-
-  const recentLessons = [
-    { 
-      title: 'Thì hiện tại', 
-      level: 'N5', 
-      duration: '15 phút',
-      completed: true,
-      color: 'bg-green-100 text-green-800'
-    },
-    { 
-      title: 'Thì quá khứ', 
-      level: 'N5', 
-      duration: '20 phút',
-      completed: true,
-      color: 'bg-green-100 text-green-800'
-    },
-    { 
-      title: 'Thể て', 
-      level: 'N4', 
-      duration: '25 phút',
-      completed: false,
-      color: 'bg-yellow-100 text-yellow-800'
-    },
-    { 
-      title: 'Thể た', 
-      level: 'N4', 
-      duration: '30 phút',
-      completed: false,
-      color: 'bg-yellow-100 text-yellow-800'
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 pt-20">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
-            <Target className="text-indigo-600" size={40} />
-            Ngữ Pháp Tiếng Nhật
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Học ngữ pháp từ cơ bản đến nâng cao. Hiểu rõ cấu trúc câu, 
-            cách sử dụng và luyện tập với bài tập tương tác.
-          </p>
-        </div>
-
-        {/* Grammar Levels */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <BookOpen className="text-indigo-600" />
-            Cấp độ ngữ pháp
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {levels.map((level) => (
-              <motion.div
-                key={level.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`relative p-6 rounded-xl text-white cursor-pointer transition-all duration-300 ${
-                  selectedLevel === level.id ? 'ring-4 ring-indigo-300' : ''
-                }`}
-                style={{
-                  background: `linear-gradient(135deg, ${level.color.replace('bg-', '')} 0%, ${level.color.replace('bg-', '').replace('-500', '-600')} 100%)`
-                }}
-                onClick={() => setSelectedLevel(level.id)}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-xl">{level.name}</h3>
-                  <Star className="text-yellow-200" size={24} />
-                </div>
-                <p className="text-sm opacity-90 mb-4">{level.description}</p>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span>Bài học:</span>
-                    <span className="font-bold">{level.lessons}</span>
-                  </div>
-                  <div className="w-full bg-white/20 rounded-full h-2">
-                    <div 
-                      className="bg-white h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${level.progress}%` }}
-                    />
-                  </div>
-                  <div className="text-sm opacity-90">
-                    {level.progress}% hoàn thành
-                  </div>
-                </div>
-                <Link 
-                  href={`/grammar/${level.id}`}
-                  className="absolute inset-0 rounded-xl"
-                />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* JLPT Patterns */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Award className="text-yellow-600" />
-            Mẫu câu JLPT
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {jlptPatterns.map((pattern, index) => (
-              <motion.div
-                key={pattern.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
-              >
-                <div className="text-center">
-                  <div className="text-3xl mb-3">{pattern.icon}</div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">{pattern.name}</h3>
-                  <p className="text-gray-600 mb-4">{pattern.patterns} mẫu câu</p>
-                  <Link
-                    href={`/grammar/jlpt/${pattern.name.toLowerCase().replace(' ', '-')}`}
-                    className={`px-4 py-2 rounded-lg text-white font-medium transition-all duration-300 bg-gradient-to-r ${pattern.color} hover:shadow-lg block text-center`}
-                  >
-                    Học ngay
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Recent Lessons & Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Lessons */}
-          <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Clock className="text-blue-600" />
-              Bài học gần đây
-            </h2>
-            <div className="space-y-4">
-              {recentLessons.map((lesson, index) => (
-                <motion.div
-                  key={lesson.title}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`px-2 py-1 rounded text-xs font-medium ${lesson.color}`}>
-                      {lesson.level}
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">{lesson.title}</h3>
-                      <p className="text-sm text-gray-600">{lesson.duration}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {lesson.completed ? (
-                      <CheckCircle size={20} className="text-green-500" />
-                    ) : (
-                      <Play size={20} className="text-blue-500" />
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Hành động nhanh</h2>
-            <div className="space-y-4">
-              <Link
-                href="/grammar/practice"
-                className="flex items-center gap-4 p-4 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors border border-blue-200"
-              >
-                <div className="p-3 rounded-lg bg-blue-500 text-white">
-                  <Target size={24} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900">Luyện tập</h3>
-                  <p className="text-sm text-gray-600">Bài tập ngữ pháp</p>
-                </div>
-              </Link>
-              
-              <Link
-                href="/grammar/quiz"
-                className="flex items-center gap-4 p-4 rounded-lg bg-green-50 hover:bg-green-100 transition-colors border border-green-200"
-              >
-                <div className="p-3 rounded-lg bg-green-500 text-white">
-                  <BookOpen size={24} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900">Kiểm tra</h3>
-                  <p className="text-sm text-gray-600">Bài kiểm tra ngữ pháp</p>
-                </div>
-              </Link>
-              
-              <Link
-                href="/grammar/reference"
-                className="flex items-center gap-4 p-4 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors border border-purple-200"
-              >
-                <div className="p-3 rounded-lg bg-purple-500 text-white">
-                  <Star size={24} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900">Tài liệu tham khảo</h3>
-                  <p className="text-sm text-gray-600">Bảng tóm tắt ngữ pháp</p>
-                </div>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+interface Memo {
+  id: number;
+  x: number;
+  y: number;
+  content: string;
 }
+
+interface CompletedStatus {
+  [key: string]: boolean;
+}
+
+const GrammarPage = () => {
+    const grammarData = [
+    {
+        "id": 1,
+        "category": "② Biểu thị nguyên nhân・lý do",
+        "title": "～おかげで",
+        "formation": "Động từ (thể thường) / Tính từ (i) + おかげで\nTính từ (na) + な / Danh từ + の + おかげで",
+        "explanation_vn": "Nhờ có... (biểu thị kết quả tốt).\n",
+        "explanation_jp": "～という良い結果になった原因・理由を表す。",
+        "examples_jp": [
+            "先生のおかげで、日本語が上手になりました。",
+            "家族の応援のおかげで、試合に勝てた。",
+            "早く寝たおかげで、今日は元気だ。"
+        ],
+        "examples_vn": [
+            "Nhờ có sự giúp đỡ của bạn bè, tôi đã vượt qua kỳ thi.",
+            "Nhờ trời tạnh mưa, chúng tôi đã có thể đi dạo.",
+            "Nhờ có thuốc, tôi đã khỏi bệnh."
+        ]
+    },
+    {
+        "id": 2,
+        "category": "② Biểu thị nguyên nhân・lý do",
+        "title": "～せいで",
+        "formation": "Động từ (thể thường) / Tính từ (i) + せいで\nTính từ (na) + な / Danh từ + の + せいで",
+        "explanation_vn": "Do/tại vì... (biểu thị kết quả xấu).\n",
+        "explanation_jp": "～という悪い結果になった原因・理由を表す。",
+        "examples_jp": [
+            "電車が遅れたせいで、会議に間に合わなかった。",
+            "彼のせいで、プロジェクトが失敗した。",
+            "携帯をいじっていたせいで、宿題が終わらなかった。"
+        ],
+        "examples_vn": [
+            "Tại tôi quên mang theo chìa khóa, nên không thể vào nhà.",
+            "Do trời mưa, chuyến đi bị hoãn lại.",
+            "Tại anh ấy đến muộn, chúng tôi phải chờ đợi."
+        ]
+    },
+    {
+        "id": 3,
+        "category": "③ Biểu thị mục đích・mục tiêu",
+        "title": "～ために",
+        "formation": "Động từ (thể từ điển) / Danh từ + の + ために",
+        "explanation_vn": "Để làm... (để đạt được mục đích).\n",
+        "explanation_jp": "前件の目的を達成するために後件の行動をすることを表す。",
+        "examples_jp": [
+            "日本語能力試験に合格するために、毎日勉強しています。",
+            "健康のために、野菜をたくさん食べます。",
+            "夢を叶えるために、一生懸命頑張る。"
+        ],
+        "examples_vn": [
+            "Để mua nhà, tôi đang tiết kiệm tiền.",
+            "Để không bị cảm, tôi sẽ mặc thêm áo.",
+            "Tôi làm thêm để có tiền đi du lịch."
+        ]
+    }
+    // ... (rest of the data)
+    ];
+
+    const grammarDataN2 = [
+    {
+        "id": 1,
+        "category": "Ngữ pháp N2",
+        "title": "〜ことになる",
+        "formation": "",
+        "explanation_vn": "Diễn tả việc đã được quyết định hoặc xảy ra như một kết quả (thường không do người nói tự quyết)。",
+        "explanation_jp": "",
+        "examples_jp": [
+            "来月から新しい先生が来ることになった。",
+            "会社の都合で、部署の異動があることになった。",
+            "契約の都合で、開催日が変更になることになった。"
+        ],
+        "examples_vn": [
+            "Đã được sắp xếp để tôi quản lý lớp buổi tối.",
+            "Cuộc họp bất ngờ bị đẩy lùi theo lịch công ty.",
+            "Kế hoạch ban đầu thay đổi vì yêu cầu đối tác."
+        ]
+    },
+    {
+        "id": 2,
+        "category": "Ngữ pháp N2",
+        "title": "〜ことにする",
+        "formation": "",
+        "explanation_vn": "Người nói tự quyết định làm (hoặc không làm) một việc。",
+        "explanation_jp": "",
+        "examples_jp": [
+            "健康のために毎朝ジョギングすることにした。",
+            "今年は海外旅行に行かないことにしました。",
+            "毎晩日本語を30分勉強することにする。"
+        ],
+        "examples_vn": [
+            "Mình quyết định sẽ học thêm từ vựng mỗi tối.",
+            "Tôi định hạn chế ăn ngoài để tiết kiệm chi phí.",
+            "Chúng tôi quyết định tổ chức buổi gặp mặt học viên mỗi tháng."
+        ]
+    }
+    // ... (rest of the data)
+    ];
+
+    const [activeLevel, setActiveLevel] = useState('n3');
+    const [currentGrammarIndex, setCurrentGrammarIndex] = useState(0);
+    const [completedStatus, setCompletedStatus] = useState<CompletedStatus>({});
+    const [memos, setMemos] = useState<Memo[]>([]);
+    const [isSidebarHidden, setSidebarHidden] = useState(false);
+    const [memoFontSize, setMemoFontSize] = useState(16);
+
+    const data = activeLevel === 'n3' ? grammarData : grammarDataN2;
+    const currentGrammar = data[currentGrammarIndex];
+
+    useEffect(() => {
+        const savedStatus = localStorage.getItem('completedStatus');
+        if (savedStatus) {
+            setCompletedStatus(JSON.parse(savedStatus));
+        }
+        const savedMemos = localStorage.getItem('memos');
+        if (savedMemos) {
+            setMemos(JSON.parse(savedMemos));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('completedStatus', JSON.stringify(completedStatus));
+    }, [completedStatus]);
+
+    useEffect(() => {
+        localStorage.setItem('memos', JSON.stringify(memos));
+    }, [memos]);
+
+    const toggleStatus = () => {
+        const newStatus = { ...completedStatus };
+        newStatus[currentGrammar.id] = !newStatus[currentGrammar.id];
+        setCompletedStatus(newStatus);
+    };
+
+    const addMemo = () => {
+        const newMemo: Memo = {
+            id: Date.now(),
+            x: 50,
+            y: 50,
+            content: ''
+        };
+        setMemos([...memos, newMemo]);
+    };
+
+    const clearMemos = () => {
+        setMemos([]);
+    };
+
+    const updateMemoContent = (id: number, content: string) => {
+        const newMemos = memos.map(memo => memo.id === id ? { ...memo, content } : memo);
+        setMemos(newMemos);
+    };
+
+    const closeMemo = (id: number) => {
+        setMemos(memos.filter(memo => memo.id !== id));
+    };
+
+
+    return (
+        <div className={`app-wrapper ${isSidebarHidden ? 'sidebar-hidden' : ''}`}>
+            <aside className="sidebar" id="sidebar">
+                <div className="sidebar-header">
+                    <h3>Ngữ pháp {activeLevel.toUpperCase()}</h3>
+                    <div className="level-switcher">
+                        <button className={`level-btn ${activeLevel === 'n3' ? 'active' : ''}`} onClick={() => setActiveLevel('n3')}>N3</button>
+                        <button className={`level-btn ${activeLevel === 'n2' ? 'active' : ''}`} onClick={() => setActiveLevel('n2')}>N2</button>
+                    </div>
+                    <button className="toggle-menu-btn" onClick={() => setSidebarHidden(!isSidebarHidden)}>☰</button>
+                </div>
+                <ul className="grammar-list">
+                    {data.map((item, index) => (
+                        <li 
+                            key={item.id} 
+                            className={`${index === currentGrammarIndex ? 'active' : ''} ${completedStatus[item.id] ? 'completed' : ''}`}
+                            onClick={() => setCurrentGrammarIndex(index)}
+                        >
+                            <span className="status-indicator"></span> {item.title}
+                        </li>
+                    ))}
+                </ul>
+            </aside>
+
+            <div className="main-content">
+                <div className="container">
+                    <header className="header">
+                        <h2>{currentGrammar.category}</h2>
+                    </header>
+
+                    <main className="content-card">
+                        <div className="card-header">
+                            <h1>{currentGrammar.title}</h1>
+                            <button 
+                                className={`status-btn ${completedStatus[currentGrammar.id] ? 'completed' : ''}`}
+                                onClick={toggleStatus}
+                            >
+                                {completedStatus[currentGrammar.id] ? 'Đã học' : 'Đánh dấu đã học'}
+                            </button>
+                        </div>
+
+                        <div className="formation-block">
+                            <pre>{currentGrammar.formation}</pre>
+                        </div>
+                        
+                        <div className="explanation">
+                            <p className="lang-jp">{currentGrammar.explanation_jp}</p>
+                            <p className="lang-vn">{currentGrammar.explanation_vn}</p>
+                        </div>
+
+                        <div className="examples">
+                            <div className="example-block">
+                                <h3>Ví dụ (JP)</h3>
+                                <ul>
+                                    {currentGrammar.examples_jp.map((ex, i) => <li key={i}>{ex}</li>)}
+                                </ul>
+                            </div>
+                            <div className="example-block">
+                                <h3>Ví dụ (VN)</h3>
+                                <ul>
+                                    {currentGrammar.examples_vn.map((ex, i) => <li key={i}>{ex}</li>)}
+                                </ul>
+                            </div>
+                        </div>
+                    </main>
+
+                    <nav className="navigation">
+                        <button className="nav-btn" onClick={() => setCurrentGrammarIndex(prev => Math.max(0, prev - 1))}>Trở về</button>
+                        <div className="page-number">
+                            <span>{currentGrammarIndex + 1}</span> / <span>{data.length}</span>
+                        </div>
+                        <button className="nav-btn" onClick={() => setCurrentGrammarIndex(prev => Math.min(data.length - 1, prev + 1))}>Tiến lên</button>
+                    </nav>
+
+                    <div className="memo-controls">
+                        <button className="memo-btn" onClick={addMemo}>Thêm Ghi chú (+)</button>
+                        <button className="memo-btn clear-btn" onClick={clearMemos}>Xóa hết Ghi chú</button>
+                        <div className="font-size-controls">
+                            <button className="memo-btn font-btn" onClick={() => setMemoFontSize(s => s - 1)}>-</button>
+                            <span>{memoFontSize}px</span>
+                            <button className="memo-btn font-btn" onClick={() => setMemoFontSize(s => s + 1)}>+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="memo-container">
+                {memos.map(memo => (
+                    <div key={memo.id} className="memo-box" style={{ top: memo.y, left: memo.x }}>
+                        <div className="memo-header">
+                            <span>Ghi chú</span>
+                            <button className="close-memo-btn" onClick={() => closeMemo(memo.id)}>×</button>
+                        </div>
+                        <textarea 
+                            value={memo.content} 
+                            onChange={(e) => updateMemoContent(memo.id, e.target.value)}
+                            style={{ fontSize: `${memoFontSize}px` }}
+                        />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export default GrammarPage;

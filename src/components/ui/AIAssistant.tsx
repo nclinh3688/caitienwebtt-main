@@ -1,20 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, 
   X, 
   Minimize2, 
   Maximize2, 
-  Send,
-  Bot,
-  User,
-  Wifi,
-  WifiOff,
-  Settings
+  Bot
 } from 'lucide-react';
-import { ollamaService } from '@/services/OllamaService';
+
 import { multiModelService } from '@/services/MultiModelService';
 
 interface Message {
@@ -42,107 +37,8 @@ export default function AIAssistant({ className }: AIAssistantProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('auto');
-  const [ollamaStatus, setOllamaStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
-  const [hasInitialized, setHasInitialized] = useState(false);
-  const chatAreaRef = useRef<HTMLDivElement>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
-
-  // Auto-scroll xuống tin nhắn mới nhất
-  useEffect(() => {
-    if (chatAreaRef.current) {
-      chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  // Auto-scroll khi streaming response
-  useEffect(() => {
-    if (isLoading) {
-    const interval = setInterval(() => {
-        if (chatAreaRef.current) {
-          chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
-        }
-      }, 200);
-      return () => clearInterval(interval);
-    }
-  }, [isLoading]);
-
-  // Auto-scroll khi chat mở
-  useEffect(() => {
-    if (isOpen && !isMinimized) {
-      if (chatAreaRef.current) {
-        chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
-      }
-    }
-  }, [isOpen, isMinimized]);
-
-  // Kiểm tra Ollama status
-  useEffect(() => {
-    const checkOllamaStatus = async () => {
-      try {
-        const response = await fetch('/api/ai/ollama');
-        if (response.ok) {
-          setOllamaStatus('available');
-        } else {
-          setOllamaStatus('unavailable');
-        }
-      } catch (error) {
-        setOllamaStatus('unavailable');
-      }
-    };
-
-    if (!hasInitialized) {
-      checkOllamaStatus();
-      setHasInitialized(true);
-    }
-  }, [hasInitialized]);
-
-  // Auto-check mỗi 30 giây thay vì 5 giây để giảm nháy
-  useEffect(() => {
-    if (hasInitialized) {
-      const interval = setInterval(() => {
-        // Chỉ check nếu chat đang mở để tiết kiệm tài nguyên
-        if (isOpen) {
-      checkOllamaStatus();
-      loadModelStatus();
-        }
-      }, 30000); // Từ 5 giây → 30 giây
-    return () => clearInterval(interval);
-    }
-  }, [hasInitialized, isOpen]);
-
-  const checkOllamaStatus = async () => {
-    // Tránh check liên tục nếu đang check
-    if (ollamaStatus === 'checking') return;
-    
-    console.log('🔍 Checking Ollama status...');
-    setOllamaStatus('checking');
-    try {
-      const result = await ollamaService.testConnection();
-      console.log('📡 Ollama test result:', result);
-      if (result.success) {
-        console.log('✅ Ollama available, model:', result.model);
-        setOllamaStatus('available');
-      } else {
-        console.log('❌ Ollama test failed:', result.message);
-        setOllamaStatus('unavailable');
-      }
-    } catch (error) {
-      console.error('💥 Ollama check error:', error);
-      setOllamaStatus('unavailable');
-    }
-  };
-
-  const loadModelStatus = async () => {
-    try {
-      const status = multiModelService.getModelStatus();
-      // setModelStatus(status); // This line was removed
-      // setAvailableModels(status.filter(m => m.isAvailable)); // This line was removed
-    } catch (error) {
-      console.error('💥 Error loading model status:', error);
-    }
-  };
+  const chatAreaRef = useRef<HTMLDivElement>(null);
 
   const getCurrentContext = () => {
     if (typeof window === 'undefined') return 'Bạn đang ở trang chính';
@@ -660,50 +556,7 @@ ${context}`;
         return;
       }
       
-      // ƯU TIÊN 2: Ollama Local (Chỉ khi không phải auto mode)
-      if (ollamaStatus === 'available' && selectedModel !== 'auto') {
-        try {
-          console.log('🏠 Sử dụng Ollama Local');
-          const aiResponse: Message = {
-            id: (Date.now() + 1).toString(),
-            type: 'ai',
-            content: '',
-            timestamp: new Date()
-          };
-          
-          setMessages(prev => [...prev, aiResponse]);
-          
-          // Streaming response từ Ollama
-          // setIsStreaming(true); // This line was removed
-          let fullResponse = '';
-          
-          for await (const chunk of ollamaService.streamChat(inputValue, context, selectedModel)) {
-            fullResponse += chunk;
-            setMessages(prev => 
-              prev.map(msg => 
-                msg.id === aiResponse.id 
-                  ? { ...msg, content: fullResponse }
-                  : msg
-              )
-            );
-          }
-          
-          // setIsStreaming(false); // This line was removed
-          setIsLoading(false);
-          return; // Thoát nếu thành công
-        } catch (error) {
-          console.log('❌ Ollama failed:', error);
-          const aiResponse: Message = {
-            id: (Date.now() + 1).toString(),
-            type: 'ai',
-            content: `❌ **Ollama Error:** ${error}\n\n💡 **Giải pháp:** Ollama local không khả dụng.`,
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, aiResponse]);
-          setIsLoading(false);
-          return;
-        }
-      }
+      
       
       // Không có Smart Fallback - chỉ báo lỗi rõ ràng
       const aiResponse: Message = {
@@ -714,12 +567,14 @@ ${context}`;
 💡 **Giải pháp để sử dụng như ChatGPT thật:**
 
 1. **Cấu hình OpenAI API Key:**
-   - Tạo file \`.env.local\` trong thư mục gốc
-   - Thêm: \`OPENAI_API_KEY=sk-your-key-here\`
+   - Tạo file \\.env.local\\ trong thư mục gốc
+   - Thêm: \
+OPENAI_API_KEY=sk-your-key-here\
    - Lấy key tại: https://platform.openai.com/api-keys
 
 2. **Cấu hình Google API Key:**
-   - Thêm: \`GOOGLE_API_KEY=your-key-here\`
+   - Thêm: \
+GOOGLE_API_KEY=your-key-here\
    - Lấy key tại: https://makersuite.google.com/app/apikey
 
 3. **Restart ứng dụng** sau khi cấu hình
@@ -767,8 +622,8 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (chatEndRef.current && !isMinimized) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (chatAreaRef.current && !isMinimized) {
+      chatAreaRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isMinimized]);
 
@@ -880,8 +735,6 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('Auto selected');
-                            setSelectedModel('auto');
                             setIsModelSelectorOpen(false);
                           }}
                           className="w-full text-left px-2 py-1.5 rounded text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center gap-2 focus:outline-none focus:ring-0"
@@ -893,8 +746,6 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('GPT-4o Mini selected');
-                            setSelectedModel('gpt-4o-mini');
                             setIsModelSelectorOpen(false);
                           }}
                           className="w-full text-left px-2 py-1.5 rounded text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center gap-2 focus:outline-none focus:ring-0"
@@ -906,8 +757,6 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('GPT-3.5 Turbo selected');
-                            setSelectedModel('gpt-3.5-turbo');
                             setIsModelSelectorOpen(false);
                           }}
                           className="w-full text-left px-2 py-1.5 rounded text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center gap-2 focus:outline-none focus:ring-0"
@@ -919,8 +768,6 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('Gemini 1.5 Flash selected');
-                            setSelectedModel('gemini-1.5-flash');
                             setIsModelSelectorOpen(false);
                           }}
                           className="w-full text-left px-2 py-1.5 rounded text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center gap-2 focus:outline-none focus:ring-0"
@@ -932,8 +779,6 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('Gemini 1.5 Pro selected');
-                            setSelectedModel('gemini-1.5-pro');
                             setIsModelSelectorOpen(false);
                           }}
                           className="w-full text-left px-2 py-1.5 rounded text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center gap-2 focus:outline-none focus:ring-0"
@@ -945,8 +790,6 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('DeepSeek Chat selected');
-                            setSelectedModel('deepseek-chat');
                             setIsModelSelectorOpen(false);
                           }}
                           className="w-full text-left px-2 py-1.5 rounded text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center gap-2 focus:outline-none focus:ring-0"
@@ -958,8 +801,6 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('Grok selected');
-                            setSelectedModel('grok');
                             setIsModelSelectorOpen(false);
                           }}
                           className="w-full text-left px-2 py-1.5 rounded text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center gap-2 focus:outline-none focus:ring-0"
@@ -977,15 +818,7 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                   <div className="flex items-center gap-3">
                     {/* Status indicator đơn giản */}
                     <div className="flex items-center gap-2">
-                      {ollamaStatus === 'checking' && (
-                        <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" title="Đang kiểm tra..."></div>
-                      )}
-                      {ollamaStatus === 'available' && (
-                        <div className="w-2 h-2 bg-green-400 rounded-full" title="Sẵn sàng"></div>
-                  )}
-                  {ollamaStatus === 'unavailable' && (
-                        <div className="w-2 h-2 bg-red-400 rounded-full" title="Không khả dụng"></div>
-                      )}
+                      
                     </div>
                     
                     {/* Action Buttons - Minimize và Close */}
@@ -1020,7 +853,7 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                       className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in-0 slide-in-from-bottom-2 duration-300`}
                     >
                       <div
-                        className={`max-w-[80%] p-2 rounded-lg ${
+                        className={`max-w-[80%] p-2 rounded-lg ${ 
                           message.type === 'user'
                             ? 'bg-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300'
                             : 'bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-900 dark:text-gray-100 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-600 transition-all duration-300'
@@ -1062,9 +895,11 @@ Sau đó AI sẽ hoạt động như ChatGPT và Gemini thật!`,
                         <div className="flex items-center gap-1.5">
                           <Bot size={12} className="text-blue-600 dark:text-blue-400" />
                           <div className="flex items-center gap-1.5">
-                            <span className="text-sm text-gray-600 dark:text-gray-300">
-                              {ollamaStatus === 'available' ? 'Đang xử lý...' : 'Đang chuẩn bị...'}
-                            </span>
+                            {isLoading && (
+                                <span className="text-sm text-gray-600 dark:text-gray-300">
+                                  Đang xử lý...
+                                </span>
+                              )}
                             <div className="flex space-x-1">
                               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
                               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>

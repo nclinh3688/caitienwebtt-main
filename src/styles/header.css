@@ -111,7 +111,7 @@ header {
 /* Dark mode header background */
 @media (prefers-color-scheme: dark) {
   header {
-    background: rgb(183, 203, 234); /* bg-gray-300 */
+    background: rgb(209 213 219); /* bg-gray-300 */
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(107, 114, 128, 0.3);
   }
@@ -136,7 +136,7 @@ header.scrolled {
 
 header > div {
   max-width: 2000px;
-  padding: 0;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -168,7 +168,7 @@ header > div {
   flex-shrink: 0;
   margin-right: 2rem;
   margin-left: 0;
-  padding-left: 16px;
+  padding-left: 0;
   min-width: 0;
   overflow: hidden;
 }
@@ -943,7 +943,7 @@ nav a.active {
 .profile-menu {
   position: absolute;
   top: 100%;
-  right: 0;
+  right: 100%;
   margin-top: 0.75rem;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);

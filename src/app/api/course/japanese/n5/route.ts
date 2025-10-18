@@ -5,8 +5,6 @@ import path from 'path';
 export async function GET() {
   try {
     // Load lessons list
-    const lessonsListPath = path.join(process.cwd(), 'src/data/jlpt-n5/lessons-n5.json');
-    const lessonsList = JSON.parse(fs.readFileSync(lessonsListPath, 'utf8'));
 
     // Load individual lesson data for B01-B10
     const lessonIds = ['B01', 'B02', 'B03', 'B04', 'B05', 'B06', 'B07', 'B08', 'B09', 'B10'];

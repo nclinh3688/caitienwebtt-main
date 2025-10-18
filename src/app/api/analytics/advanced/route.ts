@@ -5,20 +5,45 @@ import { PrismaClient } from '@prisma/client';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import OpenAI from 'openai';
 
+interface UserProgress {
+  id: string;
+  userId: string;
+  lessonId: string;
+  isCompleted: boolean;
+  completedAt?: Date | null;
+  timeSpent?: number | null;
+  score?: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface User {
+  id: string;
+  email: string | null;
+  progress: UserProgress[];
+  // Add other fields if they are used in the functions
+}
+
+interface SkillAnalysis {
+  vocabulary: number;
+  grammar: number;
+  kanji: number;
+  listening: number;
+  pronunciation: number;
+  reading: number;
+}
+
 // Initialize clients only when needed
 let prisma: PrismaClient | null = null;
 let genAI: GoogleGenerativeAI | null = null;
-let openai: OpenAI | null = null;
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const { userId } = await request.json();
 
     // Initialize Prisma client
     if (!prisma) {
@@ -56,20 +81,20 @@ export async function POST(request: Request) {
       weakPoints
     });
 
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') console.error('Error generating advanced analytics:', error);
+  } catch (_error) {
+    if (process.env.NODE_ENV === 'development') console.error('Error generating advanced analytics:', _error);
     return NextResponse.json({ 
       error: 'Failed to generate advanced analytics' 
     }, { status: 500 });
   }
 }
 
-async function calculateSkillAnalysis(user: any) {
+async function calculateSkillAnalysis(user: User) {
   // Mock calculation based on user progress
   // In a real implementation, you'd analyze test results, lesson completion, etc.
   
   const totalLessons = user.progress.length;
-  const completedLessons = user.progress.filter((p: any) => p.isCompleted).length;
+  const completedLessons = user.progress.filter((p: UserProgress) => p.isCompleted).length;
   const baseScore = Math.round((completedLessons / Math.max(totalLessons, 1)) * 100);
 
   // Mock skill scores with some variation
@@ -83,13 +108,12 @@ async function calculateSkillAnalysis(user: any) {
   };
 }
 
-async function calculateLearningVelocity(user: any) {
+async function calculateLearningVelocity(user: User) {
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
   // Recent completed lessons
-  const recentLessons = user.progress.filter((p: any) => 
+  const recentLessons = user.progress.filter((p: UserProgress) => 
     p.completedAt && new Date(p.completedAt) >= sevenDaysAgo
   ).length;
 
@@ -114,7 +138,7 @@ async function calculateLearningVelocity(user: any) {
   };
 }
 
-function calculateStudyDays(progress: any[], since: Date) {
+function calculateStudyDays(progress: UserProgress[], since: Date) {
   const studyDates = new Set();
   
   progress.forEach(p => {
@@ -127,7 +151,16 @@ function calculateStudyDays(progress: any[], since: Date) {
   return studyDates.size;
 }
 
-async function generateWeakPointAnalysis(user: any, skillAnalysis: any) {
+interface SkillAnalysis {
+  vocabulary: number;
+  grammar: number;
+  kanji: number;
+  listening: number;
+  pronunciation: number;
+  reading: number;
+}
+
+async function generateWeakPointAnalysis(user: User, skillAnalysis: SkillAnalysis) {
   try {
     // Find the weakest skills
     const skillEntries = Object.entries(skillAnalysis);
@@ -154,8 +187,8 @@ async function generateWeakPointAnalysis(user: any, skillAnalysis: any) {
     );
 
     return weakPoints;
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') console.error('Error generating weak point analysis:', error);
+  } catch (_error) {
+    if (process.env.NODE_ENV === 'development') console.error('Error generating weak point analysis:', _error);
     
     // Fallback to mock data
     return [

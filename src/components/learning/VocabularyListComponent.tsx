@@ -60,7 +60,7 @@ export default function VocabularyListComponent({
 
   // Filter and sort words
   const filteredAndSortedWords = useMemo(() => {
-    let filtered = words.filter(word => {
+    const filtered = words.filter(word => {
       const matchesSearch = 
         word.japanese.toLowerCase().includes(searchTerm.toLowerCase()) ||
         word.hiragana.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -4,7 +4,6 @@ import OpenAI from 'openai';
 
 // Initialize AI clients only when needed
 let genAI: GoogleGenerativeAI | null = null;
-let openai: OpenAI | null = null;
 
 export async function POST(request: Request) {
   try {

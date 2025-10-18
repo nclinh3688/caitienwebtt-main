@@ -77,6 +77,7 @@ export default function Header() {
       color: 'from-blue-500 to-blue-600',
       dropdown: [
         { name: 'Dashboard', href: '/dashboard', icon: '📊' },
+        { name: 'Ngữ pháp', href: '/grammar', icon: '📖' },
         { name: 'Tiến độ', href: '/progress', icon: '📈' },
         { name: 'Thành tích', href: '/achievements', icon: '🏆' },
         { name: 'AI Coach', href: '/ai-coach', icon: '🤖' }
@@ -261,7 +262,6 @@ export default function Header() {
 
           {/* Mobile Header Actions - Hidden on Desktop */}
           <div className="mobile-header-actions lg:hidden">
-            <div className="mobile-logo-text text-gray-600 font-medium">MENU</div>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="mobile-menu-button"

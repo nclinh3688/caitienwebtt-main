@@ -69,7 +69,7 @@ function FloatingContactButtons() {
 
   const contactButtons = [
     {
-      icon: <Phone size={24} />,
+      icon: <Phone className="w-4 h-4 md:w-6 md:h-6" />,
       label: "Gọi điện",
       href: "tel:0814727855",
       color: "bg-green-500 hover:bg-green-600",
@@ -77,11 +77,11 @@ function FloatingContactButtons() {
     },
     {
       icon: (
-        <div className="w-10 h-10 flex items-center justify-center">
+        <div className="w-6 h-6 md:w-10 md:h-10 flex items-center justify-center">
           <img 
             src="/icons/zalo.png" 
             alt="Zalo" 
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-6 h-6 md:w-10 md:h-10 rounded-full object-cover"
             style={{
               filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
               background: 'transparent'
@@ -96,11 +96,11 @@ function FloatingContactButtons() {
     },
     {
       icon: (
-        <div className="w-10 h-10 flex items-center justify-center">
+        <div className="w-6 h-6 md:w-10 md:h-10 flex items-center justify-center">
           <img 
             src="/icons/messenger.png" 
             alt="Messenger" 
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-6 h-6 md:w-10 md:h-10 rounded-full object-cover"
             style={{
               filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
               background: 'transparent'
@@ -144,7 +144,7 @@ function FloatingContactButtons() {
             target={button.href.startsWith('http') ? '_blank' : '_self'}
             rel={button.href.startsWith('http') ? 'noopener noreferrer' : ''}
             className={`
-              relative flex items-center justify-center w-14 h-14 rounded-full 
+              relative flex items-center justify-center w-8 h-8 md:w-14 md:h-14 rounded-full 
               ${button.color} text-white shadow-lg cursor-pointer
               transition-all duration-500 ease-out
               hover:shadow-2xl hover:scale-110 hover:brightness-110

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +8,6 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   FaChartBar, 
-  FaChartLine, 
   FaChartPie,
   FaDownload,
   FaCalendarAlt,
@@ -81,53 +80,6 @@ export function AnalyticsDashboard({
   const [selectedTimeframe, setSelectedTimeframe] = useState(timeframe);
   const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(showAdvanced);
 
-  useEffect(() => {
-    fetchAnalyticsData();
-  }, [userId, selectedTimeframe]);
-
-  const fetchAnalyticsData = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Fetch basic progress
-      const progressResponse = await fetch(`/api/progress?userId=${userId}`);
-      const progressData = await progressResponse.json();
-
-      // Fetch advanced analytics
-      const analyticsResponse = await fetch('/api/analytics/advanced', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, timeframe: selectedTimeframe }),
-      });
-      const analyticsResult = await analyticsResponse.json();
-
-      // Combine all data
-      const combinedData: AnalyticsData = {
-        skillAnalysis: analyticsResult.skillAnalysis || generateMockSkillAnalysis(),
-        learningVelocity: analyticsResult.learningVelocity || generateMockLearningVelocity(),
-        weakPoints: analyticsResult.weakPoints || generateMockWeakPoints(),
-        totalLessons: progressData.data?.totalLessons || 25,
-        completedLessons: progressData.data?.completedLessons || 8,
-        totalTime: progressData.data?.totalTimeSpent || 180,
-        averageScore: progressData.data?.averageScore || 85,
-        streak: progressData.data?.streak || 7,
-        level: progressData.data?.level || 5,
-        experience: progressData.data?.experience || 750
-      };
-
-      setAnalyticsData(combinedData);
-    } catch (err) {
-      console.error('Failed to fetch analytics data:', err);
-      setError('Không thể tải dữ liệu phân tích. Vui lòng thử lại sau.');
-      
-      // Fallback to mock data
-      setAnalyticsData(generateMockAnalyticsData());
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const generateMockSkillAnalysis = (): SkillAnalysis => ({
     vocabulary: 75 + Math.floor(Math.random() * 20),
     grammar: 65 + Math.floor(Math.random() * 20),
@@ -181,6 +133,53 @@ export function AnalyticsDashboard({
     experience: 750
   });
 
+  const fetchAnalyticsData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Fetch basic progress
+      const progressResponse = await fetch(`/api/progress?userId=${userId}`);
+      const progressData = await progressResponse.json();
+
+      // Fetch advanced analytics
+      const analyticsResponse = await fetch('/api/analytics/advanced', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, timeframe: selectedTimeframe }),
+      });
+      const analyticsResult = await analyticsResponse.json();
+
+      // Combine all data
+      const combinedData: AnalyticsData = {
+        skillAnalysis: analyticsResult.skillAnalysis || generateMockSkillAnalysis(),
+        learningVelocity: analyticsResult.learningVelocity || generateMockLearningVelocity(),
+        weakPoints: analyticsResult.weakPoints || generateMockWeakPoints(),
+        totalLessons: progressData.data?.totalLessons || 25,
+        completedLessons: progressData.data?.completedLessons || 8,
+        totalTime: progressData.data?.totalTimeSpent || 180,
+        averageScore: progressData.data?.averageScore || 85,
+        streak: progressData.data?.streak || 7,
+        level: progressData.data?.level || 5,
+        experience: progressData.data?.experience || 750
+      };
+
+      setAnalyticsData(combinedData);
+    } catch (err) {
+      console.error('Failed to fetch analytics data:', err);
+      setError('Không thể tải dữ liệu phân tích. Vui lòng thử lại sau.');
+      
+      // Fallback to mock data
+      setAnalyticsData(generateMockAnalyticsData());
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, selectedTimeframe]);
+
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [fetchAnalyticsData]);
+
   const exportData = async () => {
     if (!analyticsData) return;
 
@@ -201,12 +200,6 @@ export function AnalyticsDashboard({
       console.error('Export failed:', err);
       alert('Xuất dữ liệu thất bại. Vui lòng thử lại.');
     }
-  };
-
-  const getSkillColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 bg-green-100';
-    if (score >= 60) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
   };
 
   const getSeverityColor = (severity: string) => {
@@ -283,7 +276,7 @@ export function AnalyticsDashboard({
             <FaCalendarAlt className="text-gray-500" />
             <select
               value={selectedTimeframe}
-              onChange={(e) => setSelectedTimeframe(e.target.value as any)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedTimeframe(e.target.value as typeof selectedTimeframe)}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="week">Tuần này</option>
