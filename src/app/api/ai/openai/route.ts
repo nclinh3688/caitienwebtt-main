@@ -19,13 +19,19 @@ interface OpenAIContext {
   category?: string;
 }
 
-const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
-});
-
 export async function POST(request: NextRequest) {
   try {
     const { question, context, model = 'gpt-3.5-turbo', maxTokens = 150, temperature = 0.7 } = await request.json();
+
+    // Initialize OpenAI client only when needed
+    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+    }
+
+    const openai = new OpenAI({
+      apiKey: apiKey,
+    });
 
     // Create context-aware system prompt
     const systemPrompt = createSystemPrompt(context);
